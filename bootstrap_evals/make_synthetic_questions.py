@@ -34,8 +34,9 @@ class ChunkProcessingError(Exception):
 async def generate_evals(
     chunk: TextChunk, n_questions: int, example_questions: List[str]
 ) -> List[ChunkEval]:
+
     prompt = f"""
-        Generate `{n_questions}` question-answer pairs based on the following content:
+        Generate `{n_questions}` question-answer pairs about the Sawzall PX-1000. The answers should be derived from information in this product review:
 
         <content>
         {chunk.content}
@@ -44,10 +45,11 @@ async def generate_evals(
         Example questions:
         {chr(10).join(f'- {q}' for q in example_questions)}
 
-        Generate diverse questions that probe different aspects of the content. 
-        Provide a concise answer for each question.
-        Do not use the exact example questions, but use them as inspiration for the types of questions to generate.
+        Provide a concise and specific answer for each question.
+        Do not use the exact example questions. Use them only as inspiration for the types of more specific questions to generate.
         Do not include answers that are not in the content.
+        Questions should ask about product characteristics (e.g. durability) and answers should refer to product characteristics without referring to the reviewer specifically.
+
         """
 
     try:
@@ -111,29 +113,29 @@ def save_dataset(dataset: List[ChunkEval], filename: str):
 
 async def main():
     # Sample text chunks (replace with your actual data)
+
     sample_chunks = [
         TextChunk(
             id="chunk1",
-            content="Machine learning is a method of data analysis that automates analytical model building.",
+            content="""I've enjoyed using this saw. It is lightweight and the battery lasts longer than other brands.
+            I've been using it for 3 years now and it has been very durable. It was twice as expensive as the PX-500. But
+            it is comfortable to hold because of the light weight.""",
         ),
         TextChunk(
             id="chunk2",
-            content="Python is a high-level, interpreted programming language known for its simplicity and readability.",
+            content="I thought it would cut through tile, and it doesn't. But it goes through plastics and wood like butter.",
         ),
         TextChunk(
             id="chunk3",
-            content="Climate change refers to long-term shifts in temperatures and weather patterns, mainly caused by human activities.",
+            content="I've used this saw almost every day for a year. It's incredibly reliable. But I recommend buying the spare battery for $20. I only get 2 hours per charge.",
         ),
     ]
 
-    # Example questions and number of questions to generate
-    n_questions = 3
+    n_questions = 2  # number of questions to get in each LLM call
     example_questions = [
-        "What is the main topic of this text?",
-        "Can you summarize the key points in this content?",
-        "How does this information relate to current trends in the field?",
+        "What does the reviewer like about the product?",
+        "What does the reviewer think could be improved?",
     ]
-
     try:
         # Generate the dataset
         synthetic_dataset = await create_synthetic_dataset(
@@ -141,10 +143,10 @@ async def main():
         )
 
         # Save the dataset
-        save_dataset(synthetic_dataset, "synthetic_eval_dataset.json")
+        save_dataset(synthetic_dataset, "synthetic_eval_questions.json")
 
         logger.info(f"Generated {len(synthetic_dataset)} ChunkEvals.")
-        logger.info("Dataset saved as 'synthetic_eval_dataset.json'")
+        logger.info("Dataset saved as 'synthetic_eval_questions.json'")
     except Exception as e:
         logger.error(f"An error occurred during dataset creation: {str(e)}")
 

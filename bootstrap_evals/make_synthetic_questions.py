@@ -5,6 +5,13 @@ import logging
 import instructor
 from openai import AsyncOpenAI
 from pydantic import BaseModel
+import lancedb
+
+
+db = lancedb.connect("./lancedb")
+reviews_table = db.open_table("reviews")
+sample_reviews = reviews_table.to_pandas()
+sample_reviews.review
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

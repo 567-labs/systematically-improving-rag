@@ -1,0 +1,51 @@
+task: query_type_classification
+description: >
+  Classify user queries into predefined categories based on the type of task requested. 
+  This classification system aims to categorize incoming user queries into specific task types, 
+  such as authorization requests, content drafting, or time-sensitive information retrieval. 
+  
+  The purpose is to streamline query processing, improve response accuracy, and potentially 
+  route queries to appropriate handling systems or personnel. This classification helps in 
+  prioritizing tasks, applying relevant security measures, and ensuring that time-sensitive 
+  queries are handled promptly. 
+  
+  The system uses a set of predefined labels, each with a clear description and examples, 
+  to accurately categorize a wide range of user inputs. This approach enables efficient 
+  query handling and enhances the overall user experience by providing more targeted and 
+  timely responses to various types of requests.
+
+# For each label we show the top `n_examples` examples automatically
+n_examples: 2
+# Number of similar examples to fetch if we use RAGClassifier vs YAMLClassifer
+n_similar_examples: 2
+
+labels:
+  - name: authorization
+    description: Queries related to granting or verifying access permissions
+    examples:
+      positive: 
+        - "Can you give me access to the financial reports?"
+        - "I need permission to edit the shared document."
+      negative: 
+        - "What's the weather like today?"
+        - "Can you draft an email for me?"
+
+  - name: drafting
+    description: Queries requesting the creation or composition of content
+    examples:
+      positive: 
+        - "Write a summary of the quarterly report."
+        - "Can you draft a reply to this customer complaint?"
+      negative: 
+        - "What's the capital of France?"
+        - "Do I have permission to access the server room?"
+
+  - name: time_filter_requirement
+    description: Queries that may need to be filtered based on time-sensitive information
+    examples:
+      positive: 
+        - "What are the current stock prices for Tech Co.?"
+        - "Give me today's headlines from major news outlets."
+      negative: 
+        - "Who was the first president of the United States?"
+        - "What's the chemical formula for water?"

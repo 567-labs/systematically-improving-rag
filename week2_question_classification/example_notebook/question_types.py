@@ -143,3 +143,7 @@ question_type_details = {
         ],
     ),
 }
+
+assert set(QuestionTypes.__members__.keys()) == set(
+    [q.name for q in question_type_details.keys()]
+)

@@ -15,6 +15,8 @@ The `YamlClassifier` is a simple yet powerful classifier that uses a YAML config
 
 ## RAGClassifier
 
+> Before running the `RAGClassifier` script, make sure to set an OPENAI_API_KEY variable in your shell.
+
 The `RAGClassifier` is a classifier that uses a retreival model to classify user queries into predefined labels based on a set of examples and descriptions.
 
 ### Features

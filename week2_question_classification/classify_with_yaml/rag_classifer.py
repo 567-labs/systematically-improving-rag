@@ -3,24 +3,38 @@ from jinja2 import Template
 from yaml_classifier import YamlClassifier
 from textwrap import dedent
 from pydantic import Field
+import chromadb.utils.embedding_functions as embedding_functions
+import os
+from pydantic import Field
+import instructor
+import openai
 
 
 class RAGClassifier(YamlClassifier):
-
     fetch_n_examples: int | None = Field(default=2)
-
     __db = None
 
     def load_db(self, collection_name: str):
         if collection_name:
             chroma_client = chromadb.Client()
-            self.__db = chroma_client.get_or_create_collection(name=collection_name)
+            self.__db = chroma_client.get_or_create_collection(
+                name=collection_name,
+                embedding_function=self.get_embedding_function(),
+            )
         return self
+
+    def get_embedding_function(self):
+        return embedding_functions.OpenAIEmbeddingFunction(
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            model_name="text-embedding-3-small",
+        )
 
     def fit(self, collection_name: str):
         chroma_client = chromadb.Client()
 
-        self.__db = chroma_client.get_or_create_collection(name=collection_name)
+        self.__db = chroma_client.get_or_create_collection(
+            name=collection_name, embedding_function=self.get_embedding_function()
+        )
 
         all_examples = []
         for label in self.labels:
@@ -81,10 +95,6 @@ class RAGClassifier(YamlClassifier):
 
 
 if __name__ == "__main__":
-    from pydantic import BaseModel, Field
-    import instructor
-    import openai
-
     client = instructor.from_openai(openai.OpenAI())
 
     classifier = RAGClassifier.load("example.yaml")

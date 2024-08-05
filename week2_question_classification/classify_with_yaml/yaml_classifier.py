@@ -126,6 +126,9 @@ class YamlClassifier(BaseModel):
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_query},
             ],
+            validation_context={
+                "labels": self.get_labels(),
+            },
         )
 
     async def apredict(
@@ -140,4 +143,7 @@ class YamlClassifier(BaseModel):
             ],
             model=model,
             response_model=response_model,
+            validation_context={
+                "labels": self.get_labels(),
+            },
         )

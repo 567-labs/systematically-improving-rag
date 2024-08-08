@@ -1,20 +1,26 @@
 import openai
 import instructor
 from yaml_classifier import YamlClassifier
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, ValidationInfo
 from typing import List
 
 client = instructor.from_openai(openai.OpenAI())
 
 classifier = YamlClassifier.load("example.yaml")
 
-print(classifier.to_system_messages())
-
 
 class Prediction(BaseModel):
     correct_labels: List[str] = Field(
         description="The predicted label(s) as a list of strings"
     )
+
+    @field_validator("correct_labels")
+    def validate_labels(cls, v, info: ValidationInfo):
+        labels = info.context["labels"]
+        for label in v:
+            if label not in labels:
+                raise ValueError(f"Label {label} not in {labels}")
+        return v
 
 
 class PredictionWithReasoning(Prediction):

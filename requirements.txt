@@ -1,0 +1,6 @@
+pandas
+openai
+pydantic
+instructor
+lancedb
+tantivy

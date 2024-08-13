@@ -1,0 +1,8 @@
+openai
+instructor
+pydantic
+lancedb
+pandas
+rich
+jupyter
+ipykernel

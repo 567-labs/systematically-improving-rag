@@ -1,3 +1,5 @@
+cohere
+diskcache
 openai
 instructor
 pydantic

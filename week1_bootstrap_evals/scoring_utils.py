@@ -15,6 +15,7 @@ class EvalQuestion(BaseModel):
     question: str
     answer: str
     chunk_id: str
+    question_with_context: str
 
 
 def score(hits):
@@ -38,7 +39,7 @@ def run_reranked_request(
 
     # First, get more results than we need
     initial_results = (
-        reviews_table.search(q.question)
+        reviews_table.search(q.question_with_context)
         .select(["id", "review"])
         .limit(n_to_rerank)
         .to_list()
@@ -47,7 +48,7 @@ def run_reranked_request(
     # Prepare texts for reranking
     texts = [r["review"] for r in initial_results]
 
-    cache_key = f"{q.question}_{n_return_vals}_{model}".replace("?", "")
+    cache_key = f"{q.question_with_context}_{n_return_vals}_{model}".replace("?", "")
 
     # Try to get the result from cache
     cached_result = cache.get(cache_key)
@@ -57,7 +58,7 @@ def run_reranked_request(
     # Rerank using Cohere
     co = cohere.Client(cohere_api_key)
     reranked = co.rerank(
-        query=q.question, documents=texts, top_n=n_return_vals, model=model
+        query=q.question_with_context, documents=texts, top_n=n_return_vals, model=model
     )
 
     # Map reranked results back to original IDs

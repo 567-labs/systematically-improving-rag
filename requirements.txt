@@ -4,7 +4,10 @@ openai
 instructor
 pydantic
 lancedb
+matplotlib
+modal
 pandas
 rich
+sentence-transformers
 jupyter
 ipykernel

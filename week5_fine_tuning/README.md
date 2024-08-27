@@ -4,6 +4,6 @@ You can compare it to the [results from week 1](https://github.com/567-labs/syst
 
 The key files in this directory are:
 
-- `cohere_fine_tuning.ipynb`: Create the fine-tuned model and tests precision/recall
-
-- `sbert.ipynb`: This will test recall both with and without fine-tuning the sentence transformer model. But it does not have fine-tuning yet.
+- `finetune_sbert.py`: Fine tune a sentence transformer cross-encoder. Run this before `eval_sbert.py`.
+- `eval_sbert.py`: Evaluate recall for both the base sentence transformer model and the fine-tuned model
+- `cohere_fine_tuning.ipynb`: Create a fine-tuned cohere model and test precision/recall

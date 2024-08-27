@@ -11,3 +11,4 @@ rich
 sentence-transformers
 jupyter
 ipykernel
+wandb

@@ -7,8 +7,6 @@ from typing import List, Tuple
 
 # Constants
 FIRST_STAGE_LIMIT = 50
-RECALL_AT_5 = 5
-RECALL_AT_10 = 10
 BASE_MODEL_PATH = "cross-encoder/stsb-distilroberta-base"
 FINE_TUNED_MODEL_PATH = "./fine_tuned_reranker"
 
@@ -84,13 +82,13 @@ def evaluate_model(
         Tuple[List[float], float, float]: Ranks, recall at 5, and recall at 10.
     """
     ranks = [score_question(eval_question, model) for eval_question in eval_questions]
-    recall_at_5 = np.mean([rank <= RECALL_AT_5 for rank in ranks])
-    recall_at_10 = np.mean([rank <= RECALL_AT_10 for rank in ranks])
+    recall_at_5 = np.mean([rank <= 5 for rank in ranks])
+    recall_at_10 = np.mean([rank <= 10 for rank in ranks])
     mrr = mean_reciprocal_rank(ranks)
 
     print(f"{model_name} results:")
-    print(f"Recall at {RECALL_AT_5}: {recall_at_5}")
-    print(f"Recall at {RECALL_AT_10}: {recall_at_10}")
+    print(f"Recall at 5: {recall_at_5}")
+    print(f"Recall at 10: {recall_at_10}")
     print(f"Mean Reciprocal Rank: {mrr:.4f}")
 
     return ranks, recall_at_5, recall_at_10, mrr

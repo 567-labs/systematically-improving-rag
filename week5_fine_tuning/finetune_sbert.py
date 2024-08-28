@@ -53,8 +53,6 @@ print(f"Created {len(train_examples)} training examples")
 
 # Initialize the model
 model = CrossEncoder("cross-encoder/stsb-distilroberta-base", num_labels=1)
-
-# Prepare the training dataloader
 train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=16)
 
 # Train the model
@@ -63,7 +61,7 @@ num_epochs = 1
 print_loss_freq = 20
 
 
-# Create a custom loss function to track the loss
+# Use custom loss function to help track loss while using SBERT
 class CustomMSELoss(nn.Module):
     def __init__(self):
         super().__init__()

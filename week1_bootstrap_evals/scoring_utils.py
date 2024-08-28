@@ -30,14 +30,19 @@ def score(hits):
 def run_reranked_request(
     q: EvalQuestion,
     reviews_table: lancedb.table.LanceTable,
-    n_return_vals: int,
+    max_n_return_vals: int,
     n_to_rerank: int = 40,
     model: str = "rerank-english-v3.0",
 ) -> List[bool]:
-    # Use diskcache to reduce re-running in case of error (or addition of new data)
     cache = Cache("./cohere_cache")
+    cache_key = f"{q.question_with_context}_{max_n_return_vals}_{model}".replace(
+        "?", ""
+    )
 
-    # First, get more results than we need
+    cached_result = cache.get(cache_key)
+    if cached_result is not None:
+        return cached_result
+
     initial_results = (
         reviews_table.search(q.question_with_context)
         .select(["id", "review"])
@@ -45,20 +50,15 @@ def run_reranked_request(
         .to_list()
     )
 
-    # Prepare texts for reranking
     texts = [r["review"] for r in initial_results]
-
-    cache_key = f"{q.question_with_context}_{n_return_vals}_{model}".replace("?", "")
-
-    # Try to get the result from cache
-    cached_result = cache.get(cache_key)
-    if cached_result is not None:
-        return cached_result
 
     # Rerank using Cohere
     co = cohere.Client(cohere_api_key)
     reranked = co.rerank(
-        query=q.question_with_context, documents=texts, top_n=n_return_vals, model=model
+        query=q.question_with_context,
+        documents=texts,
+        top_n=max_n_return_vals,
+        model=model,
     )
 
     # Map reranked results back to original IDs
@@ -71,17 +71,24 @@ def run_reranked_request(
 def score_reranked_search(
     eval_questions: List[EvalQuestion],
     reviews_table: lancedb.table.LanceTable,
-    n_to_retrieve: List[int],
+    k_values: List[int],
     n_to_rerank: int = 40,
     model="rerank-english-v3.0",
-) -> Dict[str, float]:
+) -> Dict[int, Dict[str, float]]:
+    max_k = max(k_values)
     with ThreadPoolExecutor() as executor:
-        hits = list(
+        all_hits = list(
             executor.map(
                 lambda q: run_reranked_request(
-                    q, reviews_table, n_to_retrieve, n_to_rerank, model
+                    q, reviews_table, max_k, n_to_rerank, model
                 ),
                 eval_questions,
             )
         )
-    return score(hits)
+
+    results = {}
+    for k in k_values:
+        hits = [h[:k] for h in all_hits]
+        results[k] = score(hits)
+
+    return results

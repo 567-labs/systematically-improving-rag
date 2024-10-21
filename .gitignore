@@ -1,0 +1,6 @@
+# Python version files (recursive)
+**/.python-version
+
+# uv lock files (recursive)
+**/uv.lock
+

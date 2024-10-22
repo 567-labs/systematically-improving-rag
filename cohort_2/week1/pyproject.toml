@@ -9,6 +9,7 @@ dependencies = [
     "datasets>=3.0.1",
     "instructor>=1.6.3",
     "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
     "lancedb>=0.14.0",
     "openai>=1.52.0",
 ]

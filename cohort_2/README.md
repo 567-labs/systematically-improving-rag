@@ -13,7 +13,7 @@ Creating virtual environment at: .venv
 You can then install the dependencies with
 
 ```bash
-uv sync
+uv pip install -r requirements.txt
 ```
 
 Our recommendation is to use [uv](https://docs.astral.sh/uv/) where possible

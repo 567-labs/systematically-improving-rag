@@ -65,7 +65,7 @@ Evaluate and improve tool selection in multi-tool RAG systems through systematic
 
 Before starting, please read:
 
-- **[Notebook Versions Guide](latest/NOTEBOOK_VERSIONS_GUIDE.md)** - Explains the different notebook versions (standard, logfire, modal)
+- **[Notebook Versions Guide](latest#readme)** - Explains the different notebook versions (standard, logfire, modal)
 - **[Setup Verification](latest/week0/00_setup_and_verification.ipynb)** - Run this first to verify your environment
 
 ### Prerequisites

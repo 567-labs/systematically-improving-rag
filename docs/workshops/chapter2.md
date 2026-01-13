@@ -15,21 +15,10 @@ tags:
 
 ### Key Insight
 
-**If you're not fine-tuning, you're Blockbuster, not Netflix.** The goal isn't to fine-tune language models (which are expensive and complex), but to fine-tune embedding models that move toward your specific data distributions and improve retrieval, not generation.
-
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
+**The goal isn't to fine-tune language models (expensive and complex), but to fine-tune embedding models that move toward your specific data distributions and improve retrieval.** Embedding fine-tuning is accessible, fast, and delivers measurable improvements without requiring ML infrastructure or expertise.
 
 !!! success "Fine-Tuning Cost Reality Check"
-**Real Numbers from Production:**
-    - **Just 6,000 examples = 6-10% improvement** (Sentence Transformers team validated)
-    - **Cost: Hundreds of dollars in API calls** (vs tens of thousands for data labeling previously)
-    - **Time: 40 minutes training on your laptop** 
-    - **Systems at 70% can reach 85-90%** - remember that 50% to 90% recall jump from Chapter 1? That's exactly this kind of improvement
-    - **Companies see 14% accuracy boost over baseline** just from fine-tuning cross-encoders
-    - **12% increase in exact match** by training better passage encoders
-    - **20% improvement in response accuracy** with rerankers
-    - **30% reduction in irrelevant documents** with proper fine-tuning
+**Real Numbers from Production:** - **Just 6,000 examples = 6-10% improvement** (Sentence Transformers team validated) - **Cost: Hundreds of dollars in API calls** (vs tens of thousands for data labeling previously) - **Time: 40 minutes training on your laptop** - **Systems at 70% can reach 85-90%** - remember that 50% to 90% recall jump from Chapter 1? That's exactly this kind of improvement - **Companies see 14% accuracy boost over baseline** just from fine-tuning cross-encoders - **12% increase in exact match** by training better passage encoders - **20% improvement in response accuracy** with rerankers - **30% reduction in irrelevant documents** with proper fine-tuning
 
     **Language Model Fine-Tuning:**
     - Cost: $100-1000s depending on model size
@@ -39,13 +28,12 @@ tags:
 
     This dramatic difference explains why embedding fine-tuning should be your first focus.
 
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
 
 1. **Understand why off-the-shelf embeddings fail for specialized applications** - Recognize the limitations of generic models and the hidden assumptions that prevent them from handling domain-specific similarity requirements
-2. **Master the fundamentals of similarity and objective functions** - Define what "similarity" means in your specific context and design training objectives that capture these relationships  
+2. **Master the fundamentals of similarity and objective functions** - Define what "similarity" means in your specific context and design training objectives that capture these relationships
 3. **Build custom embeddings using synthetic data and evaluation frameworks** - Transform your Chapter 1 evaluation examples into training data for fine-tuning embedding models
 4. **Apply contrastive learning techniques for retrieval systems** - Implement triplet structures with hard negatives to improve domain-specific retrieval accuracy by 6-10%
 5. **Design and implement fine-tuning workflows** - Execute complete embedding and re-ranker training processes that cost hundreds of dollars rather than thousands
@@ -55,20 +43,24 @@ These objectives build directly on the evaluation foundation from Chapter 1 and 
 
 ## Introduction
 
-Remember in Chapter 1 where we talked about that $100M company with only 30 evaluation examples? Well, here's the good news: once you have those evaluation examples, you can multiply their value. The synthetic data and evaluation framework from Chapter 1 becomes your training data in this chapter.
+Once you have evaluation examples, you can multiply their value. The synthetic data and evaluation framework from Chapter 1 becomes your training data in this chapter.
 
 **Building on Chapter 1's Foundation:**
-Your evaluation examples (synthetic questions + ground truth) now become few-shot examples and training data. We're turning that evaluation flywheel into a fine-tuning flywheel.
+Your evaluation examples (synthetic questions + ground truth) now become few-shot examples and training data. The evaluation flywheel becomes a fine-tuning flywheel.
 
-Here's the thing: the data you collect for evaluation shouldn't just sit there. Every question, every relevance judgment, every piece of feedback—it can all be used to improve your system. That's what we'll cover here.
+Data collected for evaluation shouldn't sit idle. Every question, every relevance judgment, every piece of feedback can be used to improve your system.
 
-**Key Philosophy:** "This is the "wax on, wax off" moment: 20 examples become evals (Chapter 1), 30 examples become few-shot prompts, 1,000 examples let you start fine-tuning. Remember that $100M company with 30 evals? Once you have that data, this is how you turn it into actual improvements. It's never done, just gets better."
+**Progressive Data Leverage:**
 
-The process is straightforward: you start with evaluation examples, turn them into few-shot prompts, then eventually use them to fine-tune your embedding models and re-rankers. Each step builds on the last.
+- 20 examples → evaluation baselines (Chapter 1)
+- 30 examples → few-shot prompts
+- 1,000 examples → fine-tuning datasets
+
+The process is straightforward: start with evaluation examples, turn them into few-shot prompts, then eventually use them to fine-tune your embedding models and re-rankers. Each step builds on the last.
 
 ## Why Generic Embeddings Fall Short
 
-Let me start with something that trips up a lot of teams: generic embeddings from providers like OpenAI often don't work great for specialized applications. They're good models, don't get me wrong. But they're built to handle everything, which means they don't handle your specific thing particularly well.
+Generic embeddings from providers like OpenAI often underperform for specialized applications. These are well-engineered models, but they're built to handle everything, which means they don't excel at your specific use case.
 
 ### Limitation of Generic Models
 
@@ -89,9 +81,9 @@ Take music recommendations. Songs might be similar because they're the same genr
 
 Take dating apps - should "I love coffee" and "I hate coffee" be similar? Linguistically opposite, but both care enough about coffee to mention it. Generic embeddings see them as opposites. But for matching people? Maybe that matters more than word similarity. This is exactly the kind of nuance you miss without domain-specific fine-tuning.
 
-Here's the thing: **What actually matters for a dating app is whether two people will like each other**, not whether their profiles use similar words. Generic embeddings trained on web text have no idea about this.
+**What actually matters for a dating app is whether two people will like each other**, not whether their profiles use similar words. Generic embeddings trained on web text cannot capture this relationship.
 
-The problem is that "similarity" means different things in different contexts. There's no universal right answer—it depends on what you're trying to do.
+"Similarity" means different things in different contexts. There's no universal right answer—it depends on your application's goals.
 
 ### The Hidden Assumptions in Provider Models
 
@@ -103,11 +95,11 @@ Provider embeddings aren't bad—they're great for general use. But your applica
 
 ## From Evaluation to Few-Shot Examples
 
-Before jumping into fine-tuning, there's something simpler you can try: few-shot examples. Let's talk about turning your evaluation data into prompts that actually work.
+Before fine-tuning, start with something simpler: few-shot examples. Convert your evaluation data into prompts that guide model behavior.
 
 ### The Power of Examples in Context
 
-Few-shot learning is pretty straightforward: instead of retraining the model, you just show it some examples in the prompt. No special infrastructure needed.
+Few-shot learning: instead of retraining the model, provide examples in the prompt. No special infrastructure needed.
 
 ### How Few-Shot Learning Works
 
@@ -117,7 +109,7 @@ This works especially well for RAG because different types of questions need dif
 
 ### Selecting the Right Examples
 
-Don't just grab random examples from your evaluation set. I've watched teams do this and make their model worse. You need to pick the right examples.
+Don't randomly select examples from your evaluation set. Poorly chosen examples can degrade model performance. Select examples strategically.
 
 **Characteristics of Good Examples:**
 
@@ -130,7 +122,7 @@ Remember the synthetic data generation techniques we explored in Chapter 1? You 
 
 ### Building Your Few-Shot Library
 
-Build yourself a library of few-shot examples. Here's how I do it:
+Build a library of few-shot examples systematically:
 
 1. Filter your evaluation data for the best examples
 2. Group them by type (factual questions, how-to guides, comparisons)
@@ -169,6 +161,7 @@ Few-shot examples are great, but fine-tuning your embeddings is where you see re
 Building a RAG system is iterative. You start with a few examples for evaluation. Those become few-shot prompts. Eventually you have enough for fine-tuning. Each stage builds on the last.
 
 **Data Collection Milestones:**
+
 - With 20 examples, you can build basic evaluation benchmarks
 - With 30 examples, you can create effective few-shot prompts
 - With 1000+ examples, you can fine-tune your retrieval models
@@ -177,7 +170,7 @@ What's nice is you're not throwing away data—you're using it differently as yo
 
 ### Start Collecting Now
 
-You need to start collecting the right data now, even if you're not ready to fine-tune yet. The sooner you start logging relevant user interactions, the sooner you'll reach the critical mass needed for fine-tuning.
+Start collecting the right data now, even before you're ready to fine-tune. Early logging of relevant user interactions accelerates reaching the critical mass needed for fine-tuning.
 
 ### What Data Should You Log?
 
@@ -202,18 +195,18 @@ The key is defining what "relevance" means in your specific context and systemat
 
 ### Start Logging Yesterday!
 
-I've seen numerous companies hire machine learning engineers to fine-tune embedding models, only to realize they hadn't started logging relevance data. These teams then have to wait 3-6 months to collect enough data before they can begin the work they intended to do immediately.
+Organizations frequently hire machine learning engineers to fine-tune embedding models, only to discover they haven't started logging relevance data. These teams then wait 3-6 months to collect sufficient data before beginning the work they intended to start immediately.
 
 **The most important action you can take today is to start logging relevance data**, even if you're not ready to hire ML specialists or begin fine-tuning. Save the top 20-40 chunks for each query and use an LLM to mark relevance if human annotation isn't feasible. This data will be invaluable when you're ready to improve your models.
 
-I watched a team build a great RAG app for internal docs. Six months later they wanted to fine-tune embeddings but had zero data because they never set up logging. Had to start from scratch with synthetic data. Don't do this.
+Teams that build RAG applications without logging often regret it later. When they're ready to fine-tune embeddings months later, they have zero data and must start from scratch with synthetic data. Avoid this by establishing logging from day one.
 
 !!! success "Small Datasets Can Make Big Differences"
 The team at Sentence Transformers has demonstrated that even with just 6,000 examples, you can achieve 6-10% better performance. With 40 minutes of fine-tuning on a laptop, you can create significant lifetime value for your application. This makes fine-tuning embedding models accessible even to teams without massive datasets or specialized infrastructure.
 
 ## Understanding Contrastive Learning for Embeddings
 
-Let's talk about how fine-tuning actually works. Most approaches use something called contrastive learning.
+Fine-tuning embedding models typically uses contrastive learning.
 
 ### Learning Through Contrasts
 
@@ -235,7 +228,7 @@ graph LR
     A --- N[Negative: Irrelevant Document]
     P -.- |"Pull Closer"| A
     N -.- |"Push Away"| A
-````
+```
 
 This works great for embeddings because you're directly optimizing the distance relationships that matter for retrieval.
 
@@ -279,6 +272,45 @@ Through many such examples, the model learns that queries about side effects sho
 
 Notice something subtle in that example? The negative document is still about the same medication—just not about side effects. That's a "hard negative": similar in some ways, different in the ways that matter.
 
+### The Impact of Hard Negatives
+
+The quality of your negative examples dramatically affects fine-tuning results. Training with only positive examples typically yields a baseline improvement of around 6%. However, incorporating well-crafted hard negatives can increase that improvement to 30%—a 5x multiplier on your results.
+
+This difference stems from what the model actually learns. Without negatives, it learns that certain documents are relevant to certain queries. With hard negatives, it learns the boundaries between similar concepts—the subtle distinctions that separate "relevant" from "almost but not quite relevant."
+
+### Creating Effective Hard Negatives
+
+Hard negatives should be challenging but learnable. The goal is to find examples where:
+
+1. The document shares surface-level similarity with the query (same domain, related concepts, similar terminology)
+2. The document is NOT actually relevant to the user's intent
+3. The distinction is meaningful and teachable
+
+**Real-world example from financial systems:**
+
+A finance team needed to distinguish between two types of fuel expenses:
+
+- "Fuel" for employee vehicle reimbursements
+- "Equipment fuel" for company vehicles like tractors
+
+Random negatives wouldn't help the model learn this distinction. Instead, they created hard negatives by:
+
+1. Taking a transaction from one category (e.g., employee fuel reimbursement)
+2. Finding another transaction in the same category as a positive example
+3. Using embedding search to find the most similar transaction from the other category as the negative
+
+This forced the model to learn the meaningful boundary between similar but distinct concepts, dramatically improving classification accuracy.
+
+**Medical context example:**
+
+For medical abbreviations with context-dependent meanings:
+
+1. Identify the abbreviation and its multiple possible meanings (e.g., "MS" could mean "multiple sclerosis" or "mitral stenosis")
+2. Create positives using the abbreviation in the correct context
+3. Create hard negatives using the same abbreviation in a different medical context
+
+The model learns that context clues (surrounding symptoms, related conditions, patient history) determine which meaning is relevant.
+
 ### Hard Negative Mining Strategies
 
 **Effective Approaches:**
@@ -300,7 +332,7 @@ Notice something subtle in that example? The negative document is still about th
    - Example: "2023 tax rates" when user needs "2024 tax rates"
 
 > **Agentic Retrieval Perspective**
-> 
+>
 > Colin Flaherty's work on agentic coding systems reveals a surprising insight: "We found that for SweeBench tasks, embedding-based retrieval was not the bottleneck - grep and find were sufficient." The agent's persistence effectively compensated for less sophisticated tools. This suggests that while fine-tuning embeddings is valuable, the agent layer can sometimes overcome retrieval limitations through persistence. [Learn more about agentic approaches →](../talks/colin-rag-agents.md)
 
 ### Value of Hard Negatives
@@ -331,6 +363,52 @@ One team I worked with added a "more like this" button next to helpful documents
 
 Embeddings do the heavy lifting in retrieval, but re-rankers add polish. The difference: embeddings process queries and documents separately, while re-rankers look at them together and can make smarter decisions.
 
+### Quantifying Re-Ranker Impact
+
+Production data shows consistent improvements from re-rankers:
+
+- **12% improvement** at top-5 results (most common use case)
+- **20% improvement** for full-text ranking across larger result sets
+- Results hold across different domains and document types
+
+These improvements come with trade-offs:
+
+**Latency considerations:**
+
+- GPU deployment: ~30ms additional latency per query
+- CPU deployment: 4-5x slower than GPU
+- Must balance accuracy gains against user experience requirements
+
+**When re-rankers provide the most value:**
+
+- Initial retrieval returns many "close but not quite" candidates
+- Subtle relevance distinctions matter (medical, legal, technical domains)
+- User queries are complex or ambiguous
+- Cost of showing wrong results is high
+
+**When to skip re-rankers:**
+
+- Initial retrieval already achieves 90%+ precision
+- Latency requirements are strict (<100ms total)
+- Query patterns are simple and well-defined
+- Document corpus is small and homogeneous
+
+### Citation Quality and Fine-Tuning
+
+For systems that generate citations, fine-tuning can dramatically improve accuracy. One team working on automated citation systems saw their error rate drop from 4% to near-zero (0.1%) with just 1,000 training examples.
+
+**Key insights from their implementation:**
+
+1. **Validation before fine-tuning is critical**: They discovered citation errors only after implementing validation. Without measurement, they would have deployed a 4% error rate system.
+
+2. **Sample size experimentation**: Started with 100 examples (minimal improvement), expanded to 500 (moderate improvement), reached 1,000 (near-perfect accuracy). The data showed clear diminishing returns, making the 1,000-example target optimal.
+
+3. **Domain-specific training data**: Generic citation examples didn't transfer well. They needed examples from their specific domain (legal, medical, financial) where citation standards differ.
+
+4. **Error analysis drives data collection**: Their worst failures revealed specific patterns—ambiguous references, multiple authors with same surnames, incomplete metadata—which they then over-sampled in training data.
+
+This demonstrates that fine-tuning isn't just for retrieval quality—it's valuable anywhere LLMs must follow precise formatting or selection rules.
+
 ### Bi-Encoders vs. Cross-Encoders: Understanding the Trade-offs
 
 Here's the trade-off: embeddings are fast, re-rankers are accurate.
@@ -338,6 +416,7 @@ Here's the trade-off: embeddings are fast, re-rankers are accurate.
 ### Model Comparison
 
 **Bi-encoders (embedding models):**
+
 - Encode query and document independently
 - Allow pre-computation of document embeddings
 - Enable fast vector similarity operations
@@ -345,6 +424,7 @@ Here's the trade-off: embeddings are fast, re-rankers are accurate.
 - Examples include OpenAI's text-embedding models, SBERT, MPNet
 
 **Cross-encoders (re-rankers):**
+
 - Process query and document together as a pair
 - Cannot pre-compute relevance scores
 - Provide more accurate relevance judgments
@@ -369,10 +449,10 @@ Re-rankers work better with graded relevance scores instead of just yes/no label
 {
   "query": "How do I reset my password?",
   "documents": [
-    {"text": "Step-by-step password reset guide", "score": 5},
-    {"text": "General account management information", "score": 3},
-    {"text": "Creating a strong password", "score": 2},
-    {"text": "About our company", "score": 0}
+    { "text": "Step-by-step password reset guide", "score": 5 },
+    { "text": "General account management information", "score": 3 },
+    { "text": "Creating a strong password", "score": 2 },
+    { "text": "About our company", "score": 0 }
   ]
 }
 ```
@@ -603,7 +683,7 @@ Based on the content covered, here are your specific tasks:
 
 7. **Build the Data Flywheel**
    - 20 examples → evaluations
-   - 200 examples → few-shot prompts  
+   - 200 examples → few-shot prompts
    - 2,000 examples → fine-tuning datasets
    - Plan your progression through these milestones
 
@@ -640,9 +720,9 @@ Fine-tuning embeddings really works, and unlike fine-tuning LLMs, it's actually 
 !!! tip "What's Coming Next"
     In [Chapter 3](chapter3-1.md), we'll dive into deployment strategies, user feedback collection methods, and how to use this feedback to further refine your RAG application. We'll explore practical techniques for gathering implicit and explicit feedback, designing effective user interfaces, and closing the loop between user interactions and system improvements.
 
-!!! info "Related Concepts in Other Chapters" 
-    - **Query Segmentation** ([Chapter 4](chapter4-2.md)): Learn how to identify which queries benefit most from fine-tuning 
-    - **Specialized Models** ([Chapter 5](chapter5-1.md)): See how fine-tuned embeddings power specialized retrievers 
+!!! info "Related Concepts in Other Chapters"
+    - **Query Segmentation** ([Chapter 4](chapter4-2.md)): Learn how to identify which queries benefit most from fine-tuning
+    - **Specialized Models** ([Chapter 5](chapter5-1.md)): See how fine-tuned embeddings power specialized retrievers
     - **Router Optimization** ([Chapter 6](chapter6-2.md)): Understand how fine-tuning improves query routing
 
 ## Summary
@@ -660,5 +740,4 @@ Do these things now:
 If you do this right, every piece of data makes your system better. The improvements compound over time and affect everything—clustering, topic modeling, all of it.
 
 ---
-
-
+```

@@ -17,9 +17,6 @@ tags:
 
 **Different queries need different retrievers—one-size-fits-all is why most RAG systems underperform.** A search for "SKU-12345" needs exact matching, "compare pricing plans" needs structured comparison, and "how do I reset my password" needs procedural knowledge. Build specialized indices for each pattern and let a router decide. This is how Google evolved: Maps for location, Images for visual, YouTube for video.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
@@ -34,16 +31,18 @@ These objectives build directly on the roadmapping foundations from Chapter 4 an
 
 ## Introduction
 
-We've covered the basics: the RAG playbook, synthetic data generation, fine-tuning, user feedback collection, and segmentation. Now let's talk about something that actually makes a big difference in production systems—building specialized search indices for different types of content.
+The foundational work from previous chapters—evaluation frameworks, fine-tuning, feedback collection, and segmentation—has revealed something crucial: different types of queries need fundamentally different retrieval approaches. This chapter explores how to build specialized search indices that excel at specific tasks rather than performing adequately at everything.
 
 ### Building on the Foundation
 
-- **[Chapter 1](chapter1.md)**: Evaluation metrics for each specialized retriever
-- **[Chapter 2](chapter2.md)**: Fine-tuning embeddings for specific domains
-- **[Chapter 3](chapter3-1.md)**: Collecting feedback on retrieval quality
-- **[Chapter 4](chapter4-2.md)**: Identifying which capabilities need specialization
+The insights from earlier chapters directly inform specialization decisions:
 
-The basic idea is straightforward: different types of queries need different retrieval approaches. A search for a specific product number works differently than a search for "durable power tools" or "items under 50 pounds". Once you accept this, the path forward becomes clearer.
+- **Chapter 1**: Evaluation metrics reveal which query types perform poorly with your current approach
+- **Chapter 2**: Fine-tuning techniques can be applied to specialized retrievers for even better performance
+- **Chapter 3**: User feedback shows which queries frustrate users most
+- **Chapter 4**: Segmentation analysis identifies high-volume, low-satisfaction query patterns that justify building specialized solutions
+
+The pattern is clear: a monolithic retrieval system that tries to handle everything performs poorly compared to specialized systems that excel at specific tasks.
 
 ## Why Specialization Works
 
@@ -55,22 +54,25 @@ Most RAG systems start with one big index that tries to handle everything. This 
 
 ### The Hardware Store Walkthrough
 
-Let's walk through a concrete example with a hardware store's knowledge base to understand how different query types need different retrieval approaches:
+This section walks through a concrete example with a hardware store's knowledge base to understand how different query types need different retrieval approaches:
 
 **Query Type 1: Exact Product Lookup**
-- *User asks*: "Do you have DeWalt DCD771C2 in stock?"
-- *Best approach*: **Lexical search** - exact string matching on product codes
-- *Why*: Product numbers, SKUs, and model numbers need precise matching, not semantic understanding
 
-**Query Type 2: Conceptual Search** 
-- *User asks*: "What's the most durable power drill for heavy construction work?"
-- *Best approach*: **Semantic search** - understanding concepts like "durable," "heavy-duty," "construction"
-- *Why*: This requires understanding relationships between concepts, not exact matches
+- _User asks_: "Do you have DeWalt DCD771C2 in stock?"
+- _Best approach_: **Lexical search** - exact string matching on product codes
+- _Why_: Product numbers, SKUs, and model numbers need precise matching, not semantic understanding
+
+**Query Type 2: Conceptual Search**
+
+- _User asks_: "What's the most durable power drill for heavy construction work?"
+- _Best approach_: **Semantic search** - understanding concepts like "durable," "heavy-duty," "construction"
+- _Why_: This requires understanding relationships between concepts, not exact matches
 
 **Query Type 3: Attribute Filtering**
-- *User asks*: "Show me all drills under 5 pounds with at least 18V battery"
-- *Best approach*: **Structured query** - filtering on weight and voltage attributes
-- *Why*: This needs precise numerical filtering and structured data operations
+
+- _User asks_: "Show me all drills under 5 pounds with at least 18V battery"
+- _Best approach_: **Structured query** - filtering on weight and voltage attributes
+- _Why_: This needs precise numerical filtering and structured data operations
 
 Each of these queries hits the same hardware store database, but they need fundamentally different search approaches. A single "one-size-fits-all" system would handle all three poorly.
 
@@ -80,7 +82,7 @@ The best way to understand this is to look at Google's evolution. Originally, Go
 
 - **Google Maps** = Specialized for locations, routes, and geographical queries
 - **Google Images** = Optimized for visual content with computer vision
-- **YouTube** = Built for video with engagement signals and temporal understanding  
+- **YouTube** = Built for video with engagement signals and temporal understanding
 - **Google Shopping** = Designed for products with pricing, availability, and commerce
 - **Google Scholar** = Tailored for academic papers with citation networks
 
@@ -90,9 +92,46 @@ Each system isn't just "Google search filtered by type"—they use completely di
 
 The real breakthrough came when they figured out how to automatically route queries to the right specialized tool. We can apply this exact same pattern to RAG systems.
 
-> "I've been building separate indices for years without realizing that's what I was doing. This framework just helps me do it more systematically."
-> 
+> "It has been common to building separate indices for years without realizing that's what I was doing. This framework just helps me do it more systematically."
+>
 > — Previous Cohort Participant
+
+### Tool Portfolio Design: Beyond Single Retrievers
+
+The most effective RAG systems don't rely on a single retriever—they build portfolios of specialized tools that work together. This portfolio approach mirrors how command-line tools interact with a file system: you have multiple tools (`ls`, `grep`, `find`, `cat`) that can work with the same data in different ways.
+
+**Construction Example: Four Specialized Tools**
+
+A construction information system might build:
+
+1. **Blueprint Search Tool**: Extracts structured data (room counts, dimensions, building lines, floor numbers) from blueprint images
+2. **Document Search Tool**: Searches through text documents and manuals
+3. **Schedule Lookup Tool**: Queries calendar and timeline data with date filters
+4. **Contact Search Tool**: Finds people by role, project, or location with metadata filters
+
+Each tool serves different query patterns:
+
+- "Find blueprints for rooms with 2 bedrooms on the north side" → Blueprint Search
+- "What's the safety procedure for working at height?" → Document Search
+- "When is the foundation pour scheduled?" → Schedule Lookup
+- "Who's the project manager for Building A?" → Contact Search
+
+**Key Design Principles:**
+
+1. **Multiple tools can hit the same index**: Just as `ls` and `grep` both work with files, different tools can query the same underlying data differently
+2. **Tool naming impacts usage**: Providing named tools (like "grep" vs expecting models to remember grep commands) improves usage by 2-5 percentage points
+3. **Portfolio thinking beats monolithic approaches**: Instead of one mega-search tool, build specialized tools that models can intelligently select and combine
+
+**Tool Selection Strategy:**
+
+When building your portfolio, consider:
+
+- **Query patterns**: What types of questions do users ask?
+- **Data characteristics**: What structure does your data have?
+- **Capability gaps**: What can't your current system do?
+- **Business value**: Which tools unlock the most value?
+
+The goal isn't to build one perfect tool—it's to build a portfolio where each tool excels at specific tasks, and a router intelligently selects the right combination.
 
 ### The Mathematics of Specialization
 
@@ -120,7 +159,7 @@ Specialized indices also make your life easier organizationally:
 - Different teams can optimize their piece without coordination overhead
 
 > "Building specialized indices isn't just about performance—it's about creating a sustainable path for continuous improvement."
-> 
+>
 > — Industry Perspective
 
 ## Two Paths to Better Retrieval
@@ -134,12 +173,14 @@ Here's the core idea: both strategies create AI-processed views of your data—e
 Think of specialized indices as **materialized views** of your existing data, but processed by AI rather than traditional SQL operations. Just like database materialized views precompute complex queries for faster access, specialized AI indices preprocess your data into forms optimized for specific types of retrieval.
 
 **Traditional Materialized View:**
+
 - SQL precomputes complex joins and aggregations
 - Trades storage space for query speed
 - Updates when source data changes
 
 **AI Materialized View:**
-- AI precomputes structured extractions or synthetic representations  
+
+- AI precomputes structured extractions or synthetic representations
 - Trades processing time and storage for retrieval accuracy
 - Updates when source documents change or AI models improve
 
@@ -245,8 +286,8 @@ When dealing with extremely long documents (1,500-2,000+ pages), traditional chu
 4. **Tree Structure**: Build a retrieval tree from detailed chunks to high-level summaries
 
 !!! example "Legal Document Processing"
-    A tax law firm implemented RAPTOR for their regulatory documents:
-    
+A tax law firm implemented RAPTOR for their regulatory documents:
+
     - Laws on pages 1-30, exemptions scattered throughout pages 50-200
     - Clustering identified related exemptions across different sections
     - Summaries linked laws with all relevant exemptions
@@ -323,16 +364,16 @@ This formula is incredibly powerful for systematic debugging and optimization. W
 **Debugging Scenarios:**
 
 - **High routing accuracy (90%) × Low retrieval accuracy (40%) = 36% overall**
-  - *Problem*: The router works well, but individual retrievers need improvement
-  - *Solution*: Focus on fine-tuning embeddings, improving chunks, or expanding training data for specific retrievers
+  - _Problem_: The router works well, but individual retrievers need improvement
+  - _Solution_: Focus on fine-tuning embeddings, improving chunks, or expanding training data for specific retrievers
 
-- **Low routing accuracy (50%) × High retrieval accuracy (90%) = 45% overall**  
-  - *Problem*: Retrievers work when called, but the router makes poor choices
-  - *Solution*: Improve router training, add more few-shot examples, or clarify tool descriptions
+- **Low routing accuracy (50%) × High retrieval accuracy (90%) = 45% overall**
+  - _Problem_: Retrievers work when called, but the router makes poor choices
+  - _Solution_: Improve router training, add more few-shot examples, or clarify tool descriptions
 
 - **Medium performance on both (70% × 70%) = 49% overall**
-  - *Problem*: System-wide issues affecting both components
-  - *Solution*: May need fundamental architecture changes or better query understanding
+  - _Problem_: System-wide issues affecting both components
+  - _Solution_: May need fundamental architecture changes or better query understanding
 
 The key insight is that these problems require completely different solutions. Without this breakdown, you'd waste time optimizing the wrong component.
 
@@ -344,6 +385,7 @@ Measuring both levels tells you where to focus your efforts.
 ## This Week's Action Items
 
 ### Immediate Tasks (Week 1)
+
 1. **Audit Your Current System**
    - [ ] Analyze your query logs to identify at least 3 distinct query patterns that need different retrieval approaches
    - [ ] Document the specific failure cases where your current monolithic system performs poorly
@@ -360,6 +402,7 @@ Measuring both levels tells you where to focus your efforts.
    - [ ] Document what specific capabilities this index enables
 
 ### Advanced Implementation (Week 2-3)
+
 4. **Expand Your Specialized Capabilities**
    - [ ] Implement the second improvement strategy for a different query pattern
    - [ ] For documents >1,500 pages, test RAPTOR clustering and summarization
@@ -371,6 +414,7 @@ Measuring both levels tells you where to focus your efforts.
    - [ ] Use the multiplication formula to identify your limiting factor
 
 ### Production Preparation (Week 3-4)
+
 6. **Scale and Optimize**
    - [ ] Consider incremental update strategies for living documents
    - [ ] Implement caching for expensive AI processing steps
@@ -378,9 +422,10 @@ Measuring both levels tells you where to focus your efforts.
    - [ ] Prepare for Chapter 6 routing implementation
 
 ### Success Metrics
+
 - **Target**: 25-40% improvement in retrieval accuracy for your specialized capability
 - **Business Impact**: Reduced time-to-answer for users in your target segment
 - **System Health**: Clear separation between routing accuracy and individual retriever performance
 
 !!! tip "Next Steps"
-    In [Chapter 6](chapter6-1.md), we'll explore how to bring these specialized components together through intelligent routing, creating a unified system that seamlessly directs queries to the appropriate retrievers.
+In [Chapter 6](chapter6-1.md), explore how to bring these specialized components together through intelligent routing, creating a unified system that seamlessly directs queries to the appropriate retrievers.

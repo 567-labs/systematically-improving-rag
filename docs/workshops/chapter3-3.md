@@ -17,10 +17,6 @@ tags:
 
 **Having the model "think out loud" before answering improves accuracy by 15-20%—especially for long contexts.** When dealing with complex queries or extensive documents, asking the model to explicitly reiterate key information reorganizes the context and enables effective "re-reading" of the prompt. This simple technique improves reasoning without any architectural changes.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
@@ -36,16 +32,19 @@ These objectives build directly on the streaming foundations from Chapter 3.2 an
 
 ## Introduction: Building Better User Experience
 
-Building on our feedback collection from Chapter 3.1 and streaming from Chapter 3.2, let's talk about the finishing touches that make RAG systems actually usable in production.
+Feedback collection from Chapter 3.1 and streaming from Chapter 3.2 established the foundation. Now comes the finishing touches that make RAG systems genuinely usable in production.
 
-These "quality of life" improvements often make the difference between systems that are occasionally useful and those that become daily tools. They build trust through transparency, improve reasoning through explicit thinking processes, and prevent errors before they reach users.
+These "quality of life" improvements often make the difference between systems that are occasionally useful and those that become daily tools. They build trust through transparency, improve reasoning through explicit thinking processes, and prevent errors before they reach users. More importantly, they strengthen the feedback flywheel by creating more opportunities for users to engage with and improve the system.
+
+**The Impact Stack**: The legal research team from Chapter 3.1 collected 50,000+ labeled examples through interactive citations. Adding chain-of-thought reasoning improved their accuracy by 18%. Validation caught 80% of potential errors before users saw them. Together, these improvements increased attorney trust scores by 62%—fundamentally changing how the system influenced real-world decisions.
 
 **From Real Production Systems:**
+
 > Chain of thought gives you a **10% performance bump** - often the difference between "unusable" and "production-ready." With O1 and R1, we're seeing this become standard practice. But even without those models, implementing CoT in business-relevant ways is consistently one of the highest-impact changes.
-> 
+>
 > **Key insight**: Only about **20% of companies** I work with implement streaming well, but it's become table stakes. Users expect instant responses.
 
-In this chapter, we'll explore three categories of improvements:
+In this chapter, explore three categories of improvements:
 
 1. **Citations**: How to turn static references into interactive elements that build trust while providing valuable feedback signals
 1. **Chain of Thought**: Techniques to make reasoning transparent, improving both accuracy and user confidence
@@ -93,13 +92,12 @@ graph TD
 A legal research team implemented this approach for their in-house attorneys. Each response included interactive citations linked to specific case law or statutes. Attorneys could click to see full context and mark citations as relevant or irrelevant. When marked irrelevant, the system would regenerate without that source.
 
 **Measured Results:**
+
 - **50,000+ labeled examples** collected for fine-tuning (remember that data flywheel from Chapter 2?)
 - **User satisfaction: 67% → 89%** (+22 percentage points)
 - **Citation accuracy improved from 73% to 91%** through feedback loops
 - **90% of follow-up emails accepted without edits** (from transcript data)
-- **90% of follow-up emails were accepted without any edits needed**
-- Citation accuracy improved from 73% to 91% through user feedback
-- Attorney trust scores increased by 45%
+- **Attorney trust scores increased by 45%**
 
 This improved the user experience by removing unhelpful information and generated training data for the retrieval system. Each marked citation became labeled data for fine-tuning embedding models.
 
@@ -153,8 +151,6 @@ def create_citation_prompt(query: str, documents: list):
 
 On the frontend, you can turn these citations into interactive elements:
 
-
-
 This creates an interactive experience where citations are visually distinct, clickable elements. When users engage with these elements, you can collect valuable feedback while enhancing their understanding of the response.
 
 ### Advanced Citation Implementation
@@ -165,13 +161,13 @@ Based on extensive office hours discussions, here are production-tested approach
 
 The most reliable method for generating accurate citations uses XML tags with chunk IDs and text spans:
 
-**Citation Example 1: Wrapping the cited text in XML tags**
+#### Citation Example 1: Wrapping the Cited Text in XML Tags
 
 ```txt
 The study found that accurate citations improve user trust<cit id="42">Accurate citations improve user trust</cit>. Additionally, validating each citation against the source document reduces error rates<cit id="87">Validating citations reduces errors</cit>.
 ```
 
-**Citation Example 2: XML Including Citation Span**
+#### Citation Example 2: XML Including Citation Span
 
 ```txt
 The study found that accurate citations improve user trust<cit id="42" span="Accurate citations improve user trust">Accurate citations improve user trust</cit>. Additionally, validating each citation against the source document reduces error rates<cit id="87" span="Validating citations reduces errors">Validating citations reduces errors</cit>.
@@ -197,6 +193,7 @@ Significant improvements come from fine-tuning on citation-specific tasks:
 **Real-World Results:**
 
 A healthcare documentation system reduced citation errors from 4% to 0.1% through:
+
 - Fine-tuning on 1,200 validated citation examples
 - XML-based citation format with chunk IDs
 - Post-generation validation against source documents
@@ -272,8 +269,6 @@ def chain_of_thought_prompt(query: str, documents: list):
 ```
 
 Taking this a step further, you can stream the thinking process as a separate UI component or interstitial. This serves two purposes: it makes the waiting time more engaging by showing users that complex reasoning is happening, and it allows users to intervene if they notice the reasoning going astray.
-
-
 
 A financial advisory firm implemented this approach for their investment recommendation system. As the model reasoned through market conditions, client preferences, and portfolio considerations, this thinking was streamed to the advisor in a separate panel. If the advisor noticed a misunderstanding, they could pause generation and refine their query before the final recommendation.
 
@@ -367,9 +362,9 @@ After implementing this approach, 90% of the follow-up emails were accepted by s
 
 **Query:** What pricing should we offer based on this call transcript?
 
-```
+```text
 **Monologue:**
-Let me identify the key pricing variables from our documentation:
+identify the key pricing variables from our documentation:
 1. Number of users (determines tier)
 2. Required features (basic, professional, enterprise)
 3. Length of contract commitment (monthly vs. annual)
@@ -531,9 +526,7 @@ After implementing this validator, the error rate dropped from 4% to 0% after ju
 !!! success "Beyond Validation: Fine-tuning from Corrections"
 Even more interestingly, we took the validation process a step further. After collecting sufficient examples of corrections, we fine-tuned our model (distilling GPT-4 into a smaller model) using this dataset of corrected responses. The result was astonishing - the base error rate before validation dropped to nearly zero. The model had effectively learned from its corrections, internalizing the patterns of valid URLs and avoiding problematic ones altogether.
 
-```
 This entire validation and fine-tuning process took just three days to implement and resulted in a much faster application since we no longer needed the retry loop. The model now produces valid URLs in a single pass.
-```
 
 This shows how validation both catches errors and creates training data. Each correction becomes a learning opportunity, gradually reducing the need for validation.
 
@@ -547,7 +540,7 @@ It's worth noting that even in early 2025, even the most advanced models can sti
 
 One of the most overlooked strategies for improving RAG application reliability is knowing when to reject work. Rather than delaying deployment until all edge cases are solved, implement strategic rejection for scenarios where your system isn't yet strong enough. This allows you to deploy sooner while collecting data to improve problematic segments.
 
-> "One of the things you'll realize as you analyze your RAG system's performance is that oftentimes you can make your application much more reliable just by rejecting certain types of work. This is an underutilized strategy - many teams try to handle every query thrown at them rather than focusing on what they can reliably deliver."
+> "One of the things realize as you analyze your RAG system's performance is that oftentimes you can make your application much more reliable just by rejecting certain types of work. This is an underutilized strategy - many teams try to handle every query thrown at them rather than focusing on what they can reliably deliver."
 
 The approach is straightforward:
 
@@ -658,7 +651,7 @@ Each element reinforces the others, creating a system that feels polished, trust
 
 ## Preparing for the Next Chapter
 
-With these quality of life improvements in place, your RAG system now provides a better user experience that builds trust, encourages engagement, and generates valuable feedback. In the next chapter, we'll explore how to make sense of all the data you're collecting through topic modeling and clustering techniques. These approaches will help you identify patterns in user queries and system performance, revealing high-impact opportunities for improvement.
+With these quality of life improvements in place, your RAG system now provides a better user experience that builds trust, encourages engagement, and generates valuable feedback. In the next chapter, explore how to make sense of all the data you're collecting through topic modeling and clustering techniques. These approaches will help you identify patterns in user queries and system performance, revealing high-impact opportunities for improvement.
 
 ## Conclusion: Building Practical RAG Systems
 
@@ -683,6 +676,6 @@ These improvements work in concert with the feedback mechanisms from Chapter 3.1
 
 This completes our exploration of deployment and feedback collection. We've now built a robust system that not only delivers accurate information but does so in a way that users find trustworthy, engaging, and helpful. The system collects feedback naturally, feels responsive despite complex processing, and provides transparency into its reasoning and sources.
 
-In Chapter 4, we'll shift our focus to analyzing the wealth of data you're now collecting. Through topic modeling and clustering techniques, you'll learn to identify patterns in user queries and system performance, revealing focused opportunities for improvement. This marks an exciting transition from building a great system to understanding how it's being used in the real world and systematically enhancing its capabilities based on that understanding.
+In Chapter 4, shift our focus to analyzing the wealth of data you're now collecting. Through topic modeling and clustering techniques, learn to identify patterns in user queries and system performance, revealing focused opportunities for improvement. This marks an exciting transition from building a great system to understanding how it's being used in the real world and systematically enhancing its capabilities based on that understanding.
 
 By implementing the techniques from all three parts of Chapter 3, you've built the foundation for a continuous improvement cycle driven by user feedback and data analysis—a system that doesn't just answer questions but gets better with every interaction.

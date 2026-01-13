@@ -17,9 +17,6 @@ tags:
 
 **Tools are just specialized retrievers with clear interfaces—success comes from matching tool capabilities to query patterns.** Don't build one monolithic system trying to handle everything. Build focused tools that excel at specific tasks (blueprint search, schedule lookup, document retrieval) and let the router orchestrate them. The interface is the contract that makes this work.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
 ## Learning Objectives
 
 By the end of this chapter, you will:
@@ -33,16 +30,24 @@ By the end of this chapter, you will:
 
 ## Introduction
 
-## What This Chapter Covers
+Chapter 6.1 established the routing problem and showed how the construction company improved from 65% to 78% overall success by implementing proper routing. But that's only half the story—routing to the right tool means nothing if the tool itself isn't well-designed.
 
-- Implementing tool interfaces for different content types
-- Building query routers with few-shot examples
-- Creating feedback loops for routing improvement
-- Measuring router vs retriever performance
+This chapter shows you how to build the actual tools that the router calls. You'll see how to create clean interfaces, implement few-shot routing with concrete examples, and establish feedback loops that improve both routing and retrieval over time.
+
+**The Missing Implementation Details:**
+
+Chapter 6.1 showed the formula: 95% routing × 82% retrieval = 78% overall success. Now we build:
+
+- The blueprint search tool that achieves 85% accuracy
+- The document search tool with 78% accuracy
+- The schedule lookup tool at 82% accuracy
+- The router that selects between them with 95% accuracy
+
+**Why Tool Interfaces Matter**: Clean interfaces enable teams to work in parallel. The router team can build routing logic while the implementation team improves individual retrievers. Without clear interfaces, changes to one component break everything else.
 
 ## Implementing Tool Interfaces
 
-Here's how to implement tool interfaces for a construction information system with blueprints, documents, and schedules.
+How to implement tool interfaces for a construction information system with blueprints, documents, and schedules.
 
 **Related concepts from previous chapters:**
 
@@ -53,10 +58,18 @@ Here's how to implement tool interfaces for a construction information system wi
 
 ### Building a Blueprint Search Tool
 
-Let's start with a concrete example from a construction company that wants to search over images of different blueprints. The process involves two steps:
+The construction company's blueprint search (from Chapter 5.2) jumped from 27% to 85% recall using vision-generated summaries. Now we wrap that capability in a clean tool interface the router can call.
 
-1. **Blueprint Extractor**: Extract structured data from blueprint images
-2. **Blueprint Search Tool**: Query the extracted data
+**Implementation Timeline**:
+
+- **Week 1**: Built basic tool returning top 5 blueprints by semantic similarity - 65% accuracy
+- **Week 2**: Added task-specific summaries (room counts, dimensions, orientation) - 78% accuracy
+- **Week 3**: Implemented structured filtering (minimum bedrooms, date range) - 85% accuracy
+
+The process involves two steps:
+
+1. **Blueprint Extractor**: Extract structured data from blueprint images using vision models
+2. **Blueprint Search Tool**: Provide clean interface for querying extracted data
 
 #### Step 1: Blueprint Extractor
 
@@ -69,27 +82,27 @@ import datetime
 
 class BlueprintExtractor(BaseModel):
     """Extracts structured data from blueprint images using OCR and AI."""
-    
+
     def extract_from_image(self, image_path: str) -> dict:
         """
         Extract date and description from blueprint image.
-        
+
         Returns:
             dict: Extracted blueprint metadata
         """
         # Use OCR and vision models to extract text
         ocr_text = self._extract_text_from_image(image_path)
-        
+
         # Use LLM to structure the extracted text
         structured_data = self._structure_blueprint_data(ocr_text)
-        
+
         return {
             "description": structured_data.get("description", ""),
             "date": structured_data.get("date", None),
             "image_path": image_path,
             "extracted_at": datetime.datetime.now().isoformat()
         }
-    
+
     def save_to_database(self, blueprint_data: dict):
         """Save extracted blueprint data to database for searching."""
         # Implementation would depend on your database choice
@@ -246,7 +259,17 @@ This separates safe read operations from potentially dangerous write operations.
 
 ### Implementing a Simple Router
 
-Here's a basic implementation of a query router using the Instructor library for structured outputs:
+Here's how the construction company implemented their router using Instructor for structured outputs:
+
+**Few-Shot Examples Matter**: The construction company started with 10 examples per tool (30 total) and achieved 88% routing accuracy. After expanding to 40 examples per tool based on real usage patterns, accuracy improved to 95%.
+
+**Examples Drive Performance**:
+
+- 10 examples/tool: 88% routing accuracy (Week 2)
+- 20 examples/tool: 91% routing accuracy (Week 3)
+- 40 examples/tool: 95% routing accuracy (Week 6)
+
+The quality of examples matters as much as quantity. Include edge cases, ambiguous queries, and multi-tool scenarios in your example set.
 
 ```python
 import instructor
@@ -550,11 +573,13 @@ This creates a learning system that improves routing based on successful interac
 When you have limited data (20-50 examples total), it's easy for your test queries to accidentally appear in your few-shot examples. This creates artificially high performance that doesn't generalize.
 
 **Why This Happens:**
+
 - Small datasets mean high overlap probability
 - Synthetic data generation can create similar queries
 - Teams reuse examples across different purposes
 
 **Consequences:**
+
 ```
 Development Results: 95% routing accuracy ✓
 Production Reality: 60% routing accuracy ✗
@@ -562,6 +587,7 @@ User Experience: Getting few-shot examples as answers (very confusing)
 ```
 
 **Prevention Strategy:**
+
 1. **Strict Data Splits**: Create test set first, never let it contaminate few-shot examples
 2. **Diverse Synthetic Data**: Generate test queries from different prompts than training examples
 3. **Regular Auditing**: Check for semantic similarity between test and few-shot examples
@@ -573,15 +599,16 @@ User Experience: Getting few-shot examples as answers (very confusing)
 
 Imagine your router evaluation shows 65% overall recall, but when you break it down by tool:
 
-| Tool | Expected | Correctly Selected | Per-Tool Recall |
-|------|----------|-------------------|----------------|
-| SearchText | 20 | 18 | 90% |
-| SearchBlueprint | 10 | 2 | 20% |
-| SearchSchedule | 8 | 6 | 75% |
+| Tool            | Expected | Correctly Selected | Per-Tool Recall |
+| --------------- | -------- | ------------------ | --------------- |
+| SearchText      | 20       | 18                 | 90%             |
+| SearchBlueprint | 10       | 2                  | 20%             |
+| SearchSchedule  | 8        | 6                  | 75%             |
 
 **Root Cause**: SearchBlueprint has extremely low recall despite good overall metrics.
 
 **Solution Strategy:**
+
 - Add 10-15 specific examples for SearchBlueprint
 - Improve tool description to differentiate from SearchText
 - Create contrast examples: "similar query, different tools"
@@ -589,14 +616,15 @@ Imagine your router evaluation shows 65% overall recall, but when you break it d
 **Challenge 2: Tool Confusion Matrix**
 
 | Expected\Predicted | SearchText | SearchBlueprint | SearchSchedule |
-|--------------------|------------|-----------------|----------------|
-| SearchText | 18 | 1 | 1 |
-| SearchBlueprint | 8 | 2 | 0 |
-| SearchSchedule | 2 | 0 | 6 |
+| ------------------ | ---------- | --------------- | -------------- |
+| SearchText         | 18         | 1               | 1              |
+| SearchBlueprint    | 8          | 2               | 0              |
+| SearchSchedule     | 2          | 0               | 6              |
 
 **Analysis**: Blueprint queries are frequently misclassified as text search.
 
 **Systematic Debugging Process:**
+
 1. **Filter Failures**: Extract all queries where SearchBlueprint was expected but not selected
 2. **Pattern Analysis**: Look for common characteristics in failed queries
 3. **Targeted Examples**: Create specific few-shot examples addressing these patterns
@@ -605,16 +633,19 @@ Imagine your router evaluation shows 65% overall recall, but when you break it d
 ### Production Scale Considerations
 
 **Few-Shot Example Scale:**
+
 - **Development**: Start with 5-10 examples per tool
 - **Production**: Scale to 10-40 examples per tool (don't be surprised by this!)
 - **Advanced**: Use dynamic example selection with 100+ historical examples per tool
 
 **Why Large Example Sets Work:**
+
 - **Prompt Caching**: Makes large contexts economical
 - **Edge Case Coverage**: More examples = better handling of unusual queries
 - **Continuous Learning**: Successful interactions automatically become examples
 
 **Economic Considerations:**
+
 ```
 Cost Analysis (GPT-4 with prompt caching):
 - 40 examples per tool × 5 tools = 200 examples
@@ -623,9 +654,79 @@ Cost Analysis (GPT-4 with prompt caching):
 - Break-even: ~80,000 queries (often worth it for production)
 ```
 
+### Cost Calculation Methodology: Making Informed Decisions
+
+Before optimizing costs, calculate your actual token volumes and absolute costs. Many optimizations aren't worth the engineering effort once you see the real numbers.
+
+**The Token Volume Calculation Process:**
+
+1. **Calculate input tokens**: Count tokens for all documents/queries you'll process
+2. **Estimate output tokens**: Based on your task (summarization, extraction, etc.)
+3. **Multiply by model costs**: Use current API pricing
+4. **Compare alternatives**: Calculate costs for different approaches
+
+**Real-World Example: Summarization Cost Analysis**
+
+When summarizing a million conversations:
+
+- **OpenAI API**: Calculated token volumes → $60 total cost
+- **Open source models**: Only 8x cheaper → $7.50 total cost
+- **Savings**: $52.50 absolute difference
+
+**The surprising insight:** Even though open source was 8x cheaper, the absolute cost was so low ($60 total) that the engineering effort to switch wasn't justified. The models are just that affordable now.
+
+**When to Optimize:**
+
+- **High volume**: Processing millions of items regularly
+- **Large absolute costs**: When savings exceed engineering time value
+- **Repeated operations**: Tasks you'll run many times
+
+**When NOT to Optimize:**
+
+- **One-time tasks**: If you're only processing data once
+- **Low absolute costs**: When savings are tens of dollars
+- **Complex migrations**: When switching approaches adds significant complexity
+
+**Cost Calculation Framework:**
+
+```python
+def calculate_processing_cost(
+    num_items: int,
+    avg_input_tokens: int,
+    avg_output_tokens: int,
+    cost_per_1k_input: float,
+    cost_per_1k_output: float
+) -> dict:
+    """
+    Calculate total processing cost for a batch operation.
+
+    Returns breakdown of input costs, output costs, and total.
+    """
+    input_cost = (num_items * avg_input_tokens / 1000) * cost_per_1k_input
+    output_cost = (num_items * avg_output_tokens / 1000) * cost_per_1k_output
+    total_cost = input_cost + output_cost
+
+    return {
+        "input_cost": input_cost,
+        "output_cost": output_cost,
+        "total_cost": total_cost,
+        "cost_per_item": total_cost / num_items
+    }
+```
+
+**Decision Framework:**
+
+1. **Calculate absolute costs** for your specific volume
+2. **Compare alternatives** (API vs self-hosted, different models)
+3. **Estimate engineering time** to implement optimization
+4. **Make rational decision**: Only optimize if savings justify effort
+
+**Key Insight:** Modern AI models are often surprisingly affordable at scale. Calculate token volumes before investing in optimization—you might find the absolute costs are so low that further optimization isn't worth it. Focus engineering effort where it has meaningful impact.
+
 ## This Week's Action Items
 
 ### Tool Interface Implementation (Week 1)
+
 1. **Build Production-Ready Tool Interfaces**
    - [ ] Implement the blueprint search tool with date filtering and description search
    - [ ] Create document search tool with type filtering (contracts, proposals, bids)
@@ -639,6 +740,7 @@ Cost Analysis (GPT-4 with prompt caching):
    - [ ] Plan tool interfaces that work for both LLM and direct human access
 
 ### Query Routing Implementation (Week 1-2)
+
 3. **Build Intelligent Query Router**
    - [ ] Implement the Instructor-based routing system with structured outputs
    - [ ] Create 10-40 few-shot examples per tool (don't be surprised by this scale!)
@@ -652,9 +754,10 @@ Cost Analysis (GPT-4 with prompt caching):
    - [ ] Implement example quality scoring and selection mechanisms
 
 ### Advanced Routing Strategies (Week 2-3)
+
 5. **Implement Dynamic Example Selection**
    - [ ] Build example database with query embeddings for similarity matching
-   - [ ] Implement runtime retrieval of most relevant historical routing examples  
+   - [ ] Implement runtime retrieval of most relevant historical routing examples
    - [ ] Create continuous improvement cycle where successful interactions become examples
    - [ ] Test performance improvement from dynamic vs static examples
 
@@ -665,6 +768,7 @@ Cost Analysis (GPT-4 with prompt caching):
    - [ ] Implement state sharing mechanisms if using multi-agent approach
 
 ### Feedback Loop Creation (Week 2-3)
+
 7. **Build Continuous Improvement System**
    - [ ] Implement routing decision logging and analysis
    - [ ] Create user feedback collection mechanisms from successful interactions
@@ -678,6 +782,7 @@ Cost Analysis (GPT-4 with prompt caching):
    - [ ] Test user satisfaction with tool-based vs pure retrieval approaches
 
 ### Production Integration (Week 3-4)
+
 9. **Model Context Protocol (MCP) Preparation**
    - [ ] Research MCP standards for your tool interfaces (early adoption consideration)
    - [ ] Design tools to be MCP-compatible for future interoperability
@@ -691,6 +796,7 @@ Cost Analysis (GPT-4 with prompt caching):
     - [ ] Plan scaling strategy for increased query volume
 
 ### Success Metrics
+
 - **Tool Interface Quality**: Clear, well-documented interfaces that work for both AI and humans
 - **Routing Accuracy**: High precision (when tools selected, they're correct) and recall (all needed tools selected)
 - **System Learning**: Measurable improvement in routing decisions from feedback loops
@@ -698,4 +804,4 @@ Cost Analysis (GPT-4 with prompt caching):
 - **User Experience**: Both AI routing and direct tool access provide value to different user types
 
 !!! tip "Next Steps"
-	In [Chapter 6-3](chapter6-3.md), we'll implement comprehensive performance measurement and create user interfaces that leverage both AI routing and direct tool access.
+In [Chapter 6-3](chapter6-3.md), implement comprehensive performance measurement and create user interfaces that leverage both AI routing and direct tool access.

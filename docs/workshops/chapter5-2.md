@@ -17,9 +17,6 @@ tags:
 
 **Images need rich descriptions, tables need markdown, SQL needs examples—format your data for how users actually search.** The best retrieval strategy matches the user's mental model, not the data's storage format. Convert images to detailed text descriptions (85% accuracy), tables to markdown (not CSV), and SQL queries to a library of patterns. Success comes from bridging the gap between what users type and how data is stored.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
 ## Learning Objectives
 
 By the end of this chapter, you will:
@@ -33,19 +30,136 @@ By the end of this chapter, you will:
 
 ## Introduction
 
-In Chapter 5-1, we covered the foundational concepts of specialized retrieval. Now let's dive into the practical implementation details for different content types.
+Chapter 5.1 established the fundamental principle: different query types need different retrieval approaches. We learned about the two core improvement strategies (metadata extraction and synthetic text generation), the RAPTOR approach for long documents, and the two-level measurement framework.
+
+Now comes the practical implementation. This chapter shows exactly how to apply those concepts to real content types: documents, images, tables, and structured data. You'll see concrete examples of the blueprint search that jumped from 27% to 85% recall (mentioned in Chapter 1), understand why vision models struggle with search queries, and learn when to use each specialized technique.
+
+**Building on the Foundation:**
+
+- **Chapter 4's segmentation** identified which content types need specialized handling
+- **Chapter 5.1's concepts** explained why specialization works
+- **This chapter's implementations** show you exactly how to build each specialized retriever
+
+The hardware store example from Chapter 5.1 had three query types needing different approaches. This chapter shows you how to build the actual systems that handle each type.
 
 ## Handling Different Content Types
 
-Let's get into the specifics of how to handle documents, images, and tables. Each needs its own approach.
+This section covers the specifics of how to handle documents, images, and tables. Each needs its own approach.
 
 ### Document Search: Beyond Basic Chunking
 
 Document retrieval still relies on chunking and search, but here are some tweaks that actually help:
 
-**Page-Level Chunking**
+### Page-Level Chunking
 
 For documentation, respect the original page boundaries. The authors already organized the content logically—don't break it up arbitrarily.
+
+### Document Summarization as Compression
+
+Generating summaries during document ingestion creates valuable synthetic text chunks that function as a form of compression. This approach is particularly effective for improving retrieval with smaller context window models or when working with complex documents like blueprints, financial reports, or multimedia content.
+
+### The Core Idea
+
+Summaries are compression—they condense information into searchable text that captures the essential details users will query. The key is designing your summarization prompt based on the specific tasks your system needs to perform.
+
+### Real-World Example: Architectural Blueprints
+
+A construction information system needed to search architectural blueprints. Users asked questions like "Find blueprints with 4 bedrooms and 2 bathrooms" or "Show me buildings with north-facing windows." Raw blueprint images couldn't answer these queries—vision models aren't trained for this kind of spatial search.
+
+**The Problem**: Initial attempts using standard image embeddings achieved only 16% recall. Workers asked simple spatial questions and got completely unrelated blueprint segments. The system was essentially unusable.
+
+**The Solution - Day 1-2**: Created task-specific summaries that explicitly counted and listed rooms, dimensions, and key features. Designed prompts to anticipate likely queries: "Count all rooms by type, list dimensions, identify orientation and windows, note key architectural features."
+
+**The Solution - Day 3-4**: Implemented a separate "search summaries" tool that only queries the summary index. This specialization (Chapter 5.1's principle) meant spatial queries went to spatial summaries, not raw image embeddings.
+
+**The Results**: Through evaluation and iteration, recall improved from 16% to 85% in just four days—a 69 percentage point improvement. When users asked "the place with 4 bedrooms and 2 bathrooms," the summary made this information immediately findable. This is the same case study mentioned in Chapter 1's blueprint search example.
+
+**Why This Worked**: The summary prompt anticipated user mental models. Instead of describing what the blueprint looked like, it extracted what users actually searched for. This is the "format your data for how users actually search" principle from the key insight.
+
+### Implementation Pattern
+
+```python
+def create_task_specific_summary(document, task_context):
+    """
+    Generate summary optimized for specific retrieval tasks.
+
+    Args:
+        document: Source document (image, PDF, etc.)
+        task_context: What users typically query (room counts,
+                      pricing info, key dates, etc.)
+
+    Returns:
+        Summary text optimized for retrieval
+    """
+    prompt = f"""
+    Create a summary of this document optimized for these query types:
+    {task_context}
+
+    Include:
+    - Explicit counts of items users will search for
+    - Key dimensions and measurements
+    - Important dates and timelines
+    - Critical relationships between entities
+    """
+    return llm.generate_summary(document, prompt)
+```
+
+### When to Use Summarization
+
+- **Multimedia content:** Images, videos, audio need text descriptions to be searchable
+- **Financial reports:** Structured information can be extracted into searchable summaries
+- **Complex documents:** Blueprints, technical diagrams, charts benefit from task-specific summaries
+- **Small context windows:** Summaries provide dense, relevant information
+
+### Decision Framework: Choosing the Right Technique
+
+From Chapter 5.1, we learned about three main approaches. Here's when to use each:
+
+**Use Metadata Extraction (Chapter 5.1 Strategy 1) when:**
+
+- Users need to filter by specific attributes (dates, categories, status)
+- Structured information is buried in text
+- Queries involve "show me all X where Y"
+- Example: Legal contracts with signing dates, financial reports with fiscal years
+
+**Use Synthetic Text / Summarization (Chapter 5.1 Strategy 2) when:**
+
+- Content is visual or multimedia (images, videos, diagrams)
+- Users search for concepts not in the original text
+- Query patterns are predictable and task-specific
+- Example: Blueprint room counts, product feature descriptions
+
+**Use RAPTOR (Chapter 5.1 Strategy 3) when:**
+
+- Documents exceed 1,500+ pages
+- Related information spans multiple sections
+- Users need comprehensive answers pulling from scattered content
+- Example: Tax law documents with exemptions throughout, regulatory compliance documentation
+
+**Combine Multiple Approaches when:**
+
+- Different query types need different strategies
+- Some queries need filtering AND semantic search
+- Example: Construction system with blueprint search (summarization), document search (chunking), and schedule search (metadata extraction)
+
+This framework connects directly to the specialization principle from Chapter 5.1: match your retrieval strategy to user mental models and query patterns.
+
+### Best Practices
+
+1. **Design for your queries:** Summary prompts should anticipate what users will search for
+2. **Evaluate iteratively:** Test summary quality with actual user queries
+3. **Separate index:** Create a dedicated summary search tool rather than mixing with full text
+4. **Supplement, don't replace:** Use summaries alongside full-text chunks, not instead of them
+
+### Cost-Benefit Analysis
+
+Summarization adds preprocessing cost but can dramatically improve retrieval:
+
+- **Cost:** Additional LLM calls during ingestion
+- **Benefit:** Improved recall (16% → 85% in blueprint example)
+- **Trade-off:** More cost-effective than contextual retrieval for many use cases
+
+This approach works particularly well when you understand your query patterns and can design summaries that directly address them.
 
 ```python
 # Instead of arbitrary chunking:
@@ -66,16 +180,17 @@ Some other document retrieval techniques that work:
 - **Hybrid Signals**: Mix semantic similarity with recency, authority, citation counts. Don't rely on embeddings alone.
 - **Multi-stage Retrieval**: Start cheap and fast, then get more sophisticated. Filter garbage early.
 
-**The Power of Context-Aware Chunks**
+### The Power of Context-Aware Chunks
 
 Original chunk: "Jason the doctor is unhappy with Patient X"
 
 Without context, this is ambiguous:
+
 - Is Jason a medical doctor unhappy with a patient?
 - Is a doctor named Jason unhappy?
 - Is someone consulting Dr. Jason about Patient X?
 
-**Solution: Rewrite chunks with full document context:**
+### Solution: Rewrite Chunks with Full Document Context
 
 ```python
 def create_contextual_chunk(chunk, document):
@@ -95,7 +210,8 @@ def create_contextual_chunk(chunk, document):
 
 Result: "In this employee feedback document, Jason (the medical doctor on our staff) expressed dissatisfaction with the Patient X project management software due to frequent crashes."
 
-**Key Decision: Compute at write-time vs read-time**
+### Key Decision: Compute at Write-Time vs Read-Time
+
 - Write-time: Higher storage cost, faster retrieval
 - Read-time: Lower storage cost, slower retrieval
 - Most teams should compute at write-time for production
@@ -190,28 +306,33 @@ def contextual_retrieval(query: str, document_store: List[Dict[str, Any]]) -> Li
 
 ### Image Search: Bridging Visual and Textual Understanding
 
-Image search is tricky because vision models were trained on captions, but people don't search using caption-style language.
+Document search handles text well with the techniques above. But what about images? This is where we apply the synthetic text strategy from Chapter 5.1—converting visual content into rich textual descriptions optimized for how users actually search.
+
+The challenge: vision models were trained on image captions ("A dog playing in a park"), but users search with queries like "happy pets" or "outdoor activities." There's a fundamental mismatch between training data and search behavior.
 
 ### The VLM Training Challenge
 
-**Why Vision-Language Models (VLMs) Struggle with Search:**
+#### Why Vision-Language Models (VLMs) Struggle with Search
 
 Vision-Language Models were primarily trained on image-caption pairs from the web, which creates a fundamental mismatch with how people actually search:
 
-**Training Data Format:**
-- *Image captions*: "A man in a blue shirt standing next to a car"
-- *Web descriptions*: "Photo shows person outdoors"
-- *Alt text*: "Stock photo of businessman"
+#### Training Data Format
 
-**How Users Actually Search:**  
-- *Conceptual*: "professional headshot"
-- *Contextual*: "team building activities" 
-- *Functional*: "office meeting setup"
-- *Emotional*: "confident leadership pose"
+- _Image captions_: "A man in a blue shirt standing next to a car"
+- _Web descriptions_: "Photo shows person outdoors"
+- _Alt text_: "Stock photo of businessman"
+
+#### How Users Actually Search
+
+- _Conceptual_: "professional headshot"
+- _Contextual_: "team building activities"
+- _Functional_: "office meeting setup"
+- _Emotional_: "confident leadership pose"
 
 This training gap means VLMs excel at generating accurate captions but struggle to understand the conceptual, contextual, and functional language that users naturally employ when searching.
 
-**Additional VLM Limitations:**
+#### Additional VLM Limitations
+
 - **Embedding space mismatch**: Question embeddings and image caption embeddings exist in different semantic spaces
 - **Training bias**: Optimized for caption generation, not retrieval matching
 - **Context loss**: VLMs see isolated images without surrounding document context
@@ -223,12 +344,12 @@ The naive approach—applying the same embedding strategy used for text—often 
 
 **When to Use Vision Language Models:** According to Adit from Reducto, VLMs excel at "things that traditional OCR has always been horrible at" - handwriting, charts, figures, and diagrams. However, for clean structured information, traditional CV provides better precision and token efficiency. [Learn about their hybrid approach →](../talks/reducto-docs-adit.md)
 
-Here's how to make image search actually work:
+How to make image search actually work:
 
 !!! example "Advanced Image Description Techniques"
 **Rich Prompting**: Move beyond simple "what's in this image?" prompts to detailed instructions that anticipate likely queries. Compare:
 
-```
+```text
 *Basic*: "Describe this image."
 → Result: "Two people at a table."
 
@@ -299,7 +420,7 @@ The enhanced description dramatically improves retrieval capability when trouble
 
 ### Table Search: Structured Data in Context
 
-Tables are weird—they're structured data living in unstructured documents. Here's what works:
+Tables are weird—they're structured data living in unstructured documents. What works:
 
 > Adit from Reducto emphasizes that tables are particularly challenging: "Tables are particularly challenging because they represent two-dimensional associations of data that can be formatted in countless ways. The failures are often subtle - a model might extract what appears to be a valid table but silently drop rows, columns, or individual values."
 >
@@ -325,6 +446,7 @@ Why? The visual structure helps LLMs understand relationships better than nested
 Watch out for number formatting: `1 234 567` tokenizes as three separate numbers. Use `1234567` or `1,234,567` instead.
 
 **Production Table Extraction:** Reducto's approach to complex tables includes:
+
 - Using HTML for tables with 3+ merged cells
 - Traditional CV for initial extraction, VLMs for correction
 - Creating natural language summaries for better retrieval
@@ -333,7 +455,8 @@ See their [complete document parsing methodology](../talks/reducto-docs-adit.md)
 
 Two ways to handle table retrieval:
 
-**Approach 1: Table as Document**
+#### Approach 1: Table as Document
+
 Chunk the table (keep headers!) and use semantic search. Add summaries about what the table contains. Good for questions like "Which product had the highest Q3 sales?"
 
 **Approach 2: Table as Database**  
@@ -439,9 +562,10 @@ The old approach of "just translate natural language to SQL" breaks down fast wh
 We wasted months trying to fine-tune SQL generation models. Then we started retrieving similar queries from our analytics repository instead. Accuracy jumped 30% immediately.
 
 !!! example "RAPTOR: Recursive Summarization for Long Documents"
-**The RAPTOR Approach:**
 
-    When dealing with concepts that span multiple pages or sections:
+#### The RAPTOR Approach
+
+When dealing with concepts that span multiple pages or sections:
 
     1. **Cluster Related Chunks:**
        ```python
@@ -481,13 +605,14 @@ We wasted months trying to fine-tune SQL generation models. Then we started retr
 ### When Simple Tools Beat Embeddings
 
 Colin Flaherty's experience building top-performing coding agents reveals that sometimes simple tools like grep and find can outperform embedding-based retrieval: "The agent's persistence compensated for less sophisticated tools." However, he notes this works best for:
+
 - Highly structured content like code
 - Small to medium-sized repositories
 - When distinctive keywords exist
 
 For larger codebases or unstructured content, embeddings become essential. [Explore agentic retrieval patterns →](../talks/colin-rag-agents.md)
 
-Here's what actually works for SQL generation:
+What actually works for SQL generation:
 
 1. Document all your tables with good descriptions and sample data
 2. Generate test questions for different query patterns
@@ -515,7 +640,7 @@ Models can't read your mind about business logic. But if you show them examples 
 
 ## Bringing It All Together
 
-## Key Points
+### Key Points
 
 1. **Specialized beats general**: Different content types need different retrieval approaches. One-size-fits-all doesn't work.
 
@@ -528,35 +653,38 @@ Models can't read your mind about business logic. But if you show them examples 
 5. **It's also about org structure**: Specialized indices let teams work independently and improve their piece without breaking everything.
 
 !!! tip "Combining Lexical and Semantic Search"
-**The Power of Hybrid Search:**
 
-    Don't abandon lexical search! It excels at:
-    - Exact matches (product codes, names)
-    - Technical terms and abbreviations
-    - Queries with specific keywords
+#### The Power of Hybrid Search
 
-    **Implementation Strategy:**
-    ```python
-    def hybrid_search(query, k=10):
-        # Get results from both systems
-        semantic_results = semantic_search(query, k=k*2)
-        lexical_results = bm25_search(query, k=k*2)
+Don't abandon lexical search! It excels at:
 
-        # Combine with weighted scores
-        combined = merge_results(
-            semantic_results,
-            lexical_results,
-            semantic_weight=0.7,
-            lexical_weight=0.3
-        )
+- Exact matches (product codes, names)
+- Technical terms and abbreviations
+- Queries with specific keywords
 
-        return combined[:k]
-    ```
+  **Implementation Strategy:**
 
-    **Pro Tip:** Adjust weights based on query type:
-    - Technical queries: Increase lexical weight
-    - Conceptual queries: Increase semantic weight
-    - Let user behavior guide the optimization
+  ```python
+  def hybrid_search(query, k=10):
+      # Get results from both systems
+      semantic_results = semantic_search(query, k=k*2)
+      lexical_results = bm25_search(query, k=k*2)
+
+      # Combine with weighted scores
+      combined = merge_results(
+          semantic_results,
+          lexical_results,
+          semantic_weight=0.7,
+          lexical_weight=0.3
+      )
+
+      return combined[:k]
+  ```
+
+  **Pro Tip:** Adjust weights based on query type:
+  - Technical queries: Increase lexical weight
+  - Conceptual queries: Increase semantic weight
+  - Let user behavior guide the optimization
 
 ```mermaid
 flowchart TD
@@ -585,7 +713,7 @@ Once you have multiple specialized retrievers, you need a way to decide which on
 
 ### Building a Router with Function Calling
 
-Here's how to build a simple router using Instructor for structured outputs:
+How to build a simple router using Instructor for structured outputs:
 
 ```python
 from pydantic import BaseModel
@@ -598,11 +726,11 @@ client = instructor.from_openai(OpenAI())
 class DocumentSearch(BaseModel):
     """Search through text documents and manuals"""
     query: str
-    
+
 class ImageSearch(BaseModel):
     """Search through images and visual content"""
     query: str
-    
+
 class TableSearch(BaseModel):
     """Search through structured data and tables"""
     query: str
@@ -613,23 +741,23 @@ class SQLQuery(BaseModel):
 
 def route_query(user_query: str) -> List[BaseModel]:
     """Route a query to appropriate retrieval tools using parallel function calling."""
-    
+
     return client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
-                "role": "system", 
+                "role": "system",
                 "content": """You are a query router. Analyze the user's query and decide which retrieval tools to use.
-                
+
                 You can call multiple tools if needed. Here are your available tools:
                 - DocumentSearch: For questions about procedures, policies, or text content
-                - ImageSearch: For questions about visual content, diagrams, or photos  
+                - ImageSearch: For questions about visual content, diagrams, or photos
                 - TableSearch: For questions about data, comparisons, or structured information
                 - SQLQuery: For specific data queries requiring database operations
-                
+
                 Examples:
                 - "Show me the safety manual" → DocumentSearch
-                - "What does the circuit diagram look like?" → ImageSearch  
+                - "What does the circuit diagram look like?" → ImageSearch
                 - "Compare Q1 vs Q2 revenue" → TableSearch
                 - "How many users signed up last month?" → SQLQuery
                 """
@@ -647,10 +775,10 @@ The router can call multiple retrievers simultaneously using parallel function c
 ```python
 async def execute_search(user_query: str):
     """Execute search across multiple retrievers in parallel."""
-    
+
     # Step 1: Route the query
     selected_tools = route_query(user_query)
-    
+
     # Step 2: Execute all searches in parallel
     tasks = []
     for tool in selected_tools:
@@ -662,10 +790,10 @@ async def execute_search(user_query: str):
             tasks.append(search_tables(tool.query))
         elif isinstance(tool, SQLQuery):
             tasks.append(execute_sql_query(tool.query))
-    
+
     # Wait for all searches to complete
     results = await asyncio.gather(*tasks)
-    
+
     # Step 3: Combine and rank results
     return combine_and_rank_results(user_query, results)
 ```
@@ -673,11 +801,13 @@ async def execute_search(user_query: str):
 ### Short-term vs Long-term Combination Strategies
 
 **Short-term approach** (implement first):
+
 - Concatenate results from different retrievers
 - Apply a re-ranker (like Cohere) to the combined results
 - Weight results by retriever confidence scores
 
 **Long-term approach** (as you get more data):
+
 - Train dedicated ranking models using user feedback
 - Learn weights for different signal types (relevancy, recency, citations, authority)
 - Implement more sophisticated scoring that considers user context
@@ -685,29 +815,29 @@ async def execute_search(user_query: str):
 ```python
 def combine_results_short_term(query: str, results_list: List[SearchResult]) -> List[SearchResult]:
     """Simple combination strategy using re-ranking."""
-    
+
     # Concatenate all results
     all_results = []
     for results in results_list:
         all_results.extend(results)
-    
+
     # Apply re-ranker for final ordering
     reranked = cohere_rerank(query, all_results)
-    
+
     return reranked[:10]  # Return top 10
 
 def combine_results_long_term(query: str, results_list: List[SearchResult], user_context: dict) -> List[SearchResult]:
     """Advanced combination using learned weights."""
-    
+
     # Calculate weighted scores considering multiple signals
     for result in all_results:
         result.final_score = (
             0.4 * result.cosine_similarity +      # Semantic relevance
-            0.3 * result.cohere_rerank_score +    # Re-ranking score  
+            0.3 * result.cohere_rerank_score +    # Re-ranking score
             0.2 * result.recency_score +          # How recent
             0.1 * result.authority_score          # Source authority
         )
-    
+
     # Sort by final score
     return sorted(all_results, key=lambda x: x.final_score, reverse=True)[:10]
 ```
@@ -716,17 +846,18 @@ This router approach scales well—you can add new retriever types without chang
 
 ### Economics of AI Processing
 
-**Production Cost Considerations:**
+#### Production Cost Considerations
 
 From real-world implementations, here are typical costs for AI-enhanced processing:
 
 - **RAPTOR Processing**: $5-20 per large document (1,500+ pages)
-- **Image Description Generation**: $0.01-0.05 per image 
+- **Image Description Generation**: $0.01-0.05 per image
 - **Contextual Chunk Rewriting**: $0.001-0.01 per chunk
 - **Synthetic Text Generation**: $0.01-0.10 per document
 
-**ROI Calculation Framework:**
-```
+#### ROI Calculation Framework
+
+```text
 Processing Cost vs Value
 - Upfront: $10 document processing
 - Benefit: 85% improvement in finding complete information
@@ -743,11 +874,13 @@ For high-value documents accessed frequently, these costs are easily justified. 
 As you implement multiple specialized indices, organize teams around capabilities:
 
 **Content Processing Teams:**
+
 - **Document Team**: PDF processing, contextual retrieval, RAPTOR implementation
 - **Vision Team**: Image description, OCR enhancement, visual grounding
 - **Structured Data Team**: Table processing, SQL generation, metadata extraction
 
 **Platform Teams:**
+
 - **Evaluation Team**: Synthetic data generation, performance measurement across all indices
 - **Infrastructure Team**: Caching, compute optimization, incremental updates
 - **Router Team**: Tool orchestration, few-shot example management
@@ -767,6 +900,7 @@ Remember: even as AI gets better, you're still responsible for retrieval. Knowin
 ## This Week's Action Items
 
 ### Document Processing Implementation (Week 1)
+
 1. **Implement Contextual Retrieval**
    - [ ] Audit your current chunking strategy - are you respecting logical document boundaries?
    - [ ] Implement page-aware chunking with min/max size constraints (200-2000 tokens)
@@ -779,57 +913,62 @@ Remember: even as AI gets better, you're still responsible for retrieval. Knowin
    - [ ] Measure latency improvements vs accuracy trade-offs
 
 ### Image Search Implementation (Week 1-2)
-3. **Bridge the VLM Training Gap**
+
+1. **Bridge the VLM Training Gap**
    - [ ] Implement the rich image description prompt template provided in the chapter
    - [ ] Test on 20 images from your domain, comparing basic vs detailed descriptions
    - [ ] Add OCR extraction and surrounding text context to your image processing pipeline
    - [ ] Measure embedding space alignment between queries and enhanced descriptions
 
-4. **Production Image Processing**
+2. **Production Image Processing**
    - [ ] Implement bounding box extraction for applications requiring counting or spatial reasoning
    - [ ] Build visual grounding capabilities for construction, manufacturing, or retail use cases
    - [ ] Create synthetic test queries that match how users actually search for images
 
 ### Table Search Implementation (Week 2)
-5. **Optimize Table Representation**
+
+1. **Optimize Table Representation**
    - [ ] Convert existing table storage to markdown format (not CSV or JSON)
    - [ ] Test the dual approach: document-like search vs database-like schema search
    - [ ] Generate natural language summaries of table contents for better retrieval
    - [ ] Preserve headers in all table chunks to maintain context
 
-6. **SQL Generation Enhancement**
+2. **SQL Generation Enhancement**
    - [ ] Build a query library of successful SQL patterns from your domain
    - [ ] Implement business-specific definitions (what is "monthly active users" for your company?)
    - [ ] Test retrieval-augmented SQL generation vs naive text-to-SQL
    - [ ] Create evaluation dataset with subjective queries and correct interpretations
 
 ### Router and Hybrid Search (Week 2-3)
-7. **Implement Simple Routing**
+
+1. **Implement Simple Routing**
    - [ ] Build the function calling router example from the chapter using your specialized tools
    - [ ] Test parallel tool execution and result combination
    - [ ] Measure routing accuracy on a test set with annotated correct tools
    - [ ] Implement both short-term (concatenation + reranking) and plan for long-term combination strategies
 
-8. **Hybrid Search Optimization**
+2. **Hybrid Search Optimization**
    - [ ] Implement the hybrid search function with adjustable semantic/lexical weights
    - [ ] Test different weight combinations across query types (technical vs conceptual)
    - [ ] A/B test user satisfaction with hybrid vs pure semantic search
    - [ ] Build query classification to automatically adjust weights
 
 ### Production Readiness (Week 3-4)
-9. **Performance and Scaling**
+
+1. **Performance and Scaling**
    - [ ] Implement prompt caching for contextual retrieval at scale
    - [ ] Build monitoring dashboards for each specialized retriever type
    - [ ] Plan compute costs: write-time vs read-time processing decisions
    - [ ] Test incremental updates for dynamic content
 
-10. **Integration Preparation**
-    - [ ] Document your tool interfaces in the format expected by Chapter 6 routing
-    - [ ] Create synthetic test data for each specialized capability you've built
-    - [ ] Measure individual tool performance before adding routing complexity
-    - [ ] Prepare few-shot examples showing when each tool should be used
+2. **Integration Preparation**
+   - [ ] Document your tool interfaces in the format expected by Chapter 6 routing
+   - [ ] Create synthetic test data for each specialized capability you've built
+   - [ ] Measure individual tool performance before adding routing complexity
+   - [ ] Prepare few-shot examples showing when each tool should be used
 
 ### Success Metrics
+
 - **Document Search**: 40% improvement in context-aware retrieval accuracy
 - **Image Search**: 85% accuracy in matching user queries to image descriptions
 - **Table Search**: Successful handling of both specific lookups and analytical queries
@@ -837,4 +976,4 @@ Remember: even as AI gets better, you're still responsible for retrieval. Knowin
 - **Overall System**: Clear performance measurement at both tool and routing levels
 
 !!! tip "Cross-Reference"
-    In [Chapter 6](chapter6-1.md), we'll explore how to bring these specialized components together through effective routing strategies, creating a unified system that seamlessly directs users to the appropriate retrievers based on their queries.
+In [Chapter 6](chapter6-1.md), explore how to bring these specialized components together through effective routing strategies, creating a unified system that seamlessly directs users to the appropriate retrievers based on their queries.

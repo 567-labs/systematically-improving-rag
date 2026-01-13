@@ -10,10 +10,6 @@ author: Jason Liu
 
 **Good copy beats good UI—changing "How did we do?" to "Did we answer your question?" increases feedback rates by 5x.** The difference between 0.1% and 0.5% feedback isn't just more data. It's the difference between flying blind and having a clear view of what's working. Design your feedback mechanisms to be specific, contextual, and integrated into the natural user flow.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
@@ -32,12 +28,13 @@ These objectives build directly on the evaluation framework from Chapter 1 and p
 RAG systems improve most when they collect feedback effectively. Many implementations focus exclusively on the technical details of retrieval and generation while neglecting the infrastructure needed to collect and utilize user feedback.
 
 **Building on What We've Done:**
+
 - **Chapter 1**: Remember that evaluation framework? Your synthetic data baseline? Now we make it real with user feedback
 - **Chapter 2**: Those fine-tuning techniques need feedback data to work - this chapter shows you how to collect it
 
-Remember that $100M company with 30 evals? Here's how you go from 30 examples to thousands through smart feedback collection.
+Remember that $100M company with 30 evals? How you go from 30 examples to thousands through smart feedback collection.
 
-In this chapter, we'll explore how to build effective feedback mechanisms that turn your RAG application from a static implementation into a continuously improving system. This approach creates a feedback loop where user interactions provide the data needed to make the system better.
+In this chapter, explore how to build effective feedback mechanisms that turn your RAG application from a static implementation into a continuously improving system. This approach creates a feedback loop where user interactions provide the data needed to make the system better.
 
 ### The Invisible Feedback Problem
 
@@ -46,18 +43,14 @@ Many RAG implementations hide feedback mechanisms in obscure UI locations or use
 I keep seeing this in consulting: changing "How did we do?" to "Did we answer your question?" increases feedback rates by **5x** (0.1% to 0.5%). That's not just more data - it's the difference between flying blind and seeing clearly.
 
 **Real Numbers from Clients:**
-- **10 to 40+ responses per day** just from better copy 
+
+- **10 to 40+ responses per day** just from better copy
 - **90% follow-up email acceptance without edits** (from transcript: clients using structured feedback)
 - **35% reduction in escalation rates** when feedback gets specific
 - **Only 20% of companies** I work with actually implement streaming well - but the ones that do see massive UX improvements
 
 !!! success "Effective Feedback Copy"
-**Copy That Actually Works:**
-    - ✅ "Did we answer your question?" 
-    - ✅ "Was this information helpful?"
-    - ✅ "Did we take the correct actions?"
-    - ❌ "How did we do?" (generic and useless)
-    - ❌ "Rate your experience" (nobody cares about your experience)
+**Copy That Actually Works:** - ✅ "Did we answer your question?" - ✅ "Was this information helpful?" - ✅ "Did we take the correct actions?" - ❌ "How did we do?" (generic and useless) - ❌ "Rate your experience" (nobody cares about your experience)
 
     **Context-Specific Examples:**
     - For coding assistants: "Did this code solve your problem?"
@@ -79,12 +72,58 @@ This chapter focuses on the practical implementation of feedback mechanisms in R
 
 The first principle of effective feedback collection is visibility. Your feedback mechanisms should be prominent and engaging, not hidden in dropdown menus or settings pages. Users should encounter feedback options naturally as part of their interaction flow.
 
-### High-Visibility Feedback UI
+###High-Visibility Feedback UI
 
-Here's what I see working vs. what doesn't:
+What works vs. what doesn't:
 
-**What Doesn't Work:** 
+**What Doesn't Work:**
 Tiny thumbs up/down hidden in corner (0.1% response rate)
+
+**What Works:**
+Prominent, contexual feedback request (0.4-0.5% response rate)
+
+The difference seems small, but it's massive. Going from 0.1% to 0.5% means 5x more data to work with.
+
+### The Power of Specific Feedback Copy
+
+Generic feedback requests yield generic responses. Specific questions drive actionable insights.
+
+**Zapier's 4x Improvement:**
+
+Zapier Central faced a common challenge: abysmally low feedback rates (about 10 submissions per day) that were almost exclusively negative. Users only bothered to give feedback when something broke badly enough to frustrate them.
+
+They made a deceptively simple change that produced dramatic results. Instead of using tiny, muted feedback buttons hidden in the corner, they added a natural-looking chat message at the end of workflow tests asking: **"Did this run do what you expected it to do?"**
+
+Combined with larger, more visible thumbs-up and thumbs-down buttons, this increased feedback submissions from 10 to 40 per day—a 4x improvement. Even more valuable: they started receiving substantial positive feedback, which had been almost non-existent before.
+
+**Why this worked:**
+
+1. **Positioning**: The request appeared as a natural part of the conversation, not a UI affordance
+2. **Timing**: Asked immediately after the interaction while context was fresh
+3. **Specificity**: "Did this do what you expected?" is clearer than "How did we do?"
+4. **Visibility**: Larger buttons made the action obvious
+
+The specificity guided users toward functional feedback rather than subjective opinions about speed or aesthetics. By focusing the question on their primary concern—whether the workflow performed the intended action—they received more actionable responses.
+
+**General vs Specific Questions:**
+
+Bad: "How did we do?"
+
+- Too generic
+- User doesn't know what aspect to evaluate
+- Yields vague responses
+
+Better: "Did we answer your question?"
+
+- Focuses on core functionality
+- Binary outcome is clear
+- Easier to respond quickly
+
+Best: "Did this run do what you expected it to do?"
+
+- Contextual to the specific interaction
+- Focuses on functional correctness
+- Acknowledges user's intent
 
 **What Actually Works:**
 
@@ -92,13 +131,16 @@ Tiny thumbs up/down hidden in corner (0.1% response rate)
 
 If "Somewhat" or "No":
 "What was missing?"
+
 - [ ] More detailed explanation
-- [ ] Different information needed  
+- [ ] Different information needed
 - [ ] Information was wrong
 
 Remember: users perceive animated progress bars as **11% faster** even when wait times are identical. Good UX matters for feedback collection too.
+
 - [ ] Better formatting
-- [ ] Other: ____________
+- [ ] Other: \***\*\_\_\_\_\*\***
+
 ```
 
 The second approach not only makes feedback impossible to miss but also structures it in a way that provides more actionable insights. Data shows that visible feedback mechanisms can increase feedback rates from less than 1% to over 30%.
@@ -126,6 +168,7 @@ Claude's implementation of progress counters during response generation serves m
 
 **Implementation Pattern:**
 ```
+
 Searching documents... [████░░░░░░] 40%
 Found 5 relevant sources
 Analyzing content... [████████░░] 80%
@@ -134,7 +177,8 @@ Generating response... [██████████] 100%
 [Response appears here]
 
 Did we find the right information? [Yes] [No]
-```
+
+````
 
 This pattern makes feedback feel like a natural continuation of the interaction rather than an interruption.
 
@@ -149,7 +193,7 @@ Before diving into enterprise patterns, let's learn from systems that excel at f
 
 **The RAG Application Lesson**: Design interactions that naturally generate training labels:
 - Citation deletion = negative examples for retrieval
-- Follow-up clicks = positive engagement signals  
+- Follow-up clicks = positive engagement signals
 - Query refinement patterns = preference learning data
 - Copy/save actions = high-quality response indicators
 
@@ -225,7 +269,7 @@ Negative feedback is particularly valuable for improvement, but users often aban
 1. Keep detailed feedback optional but make it easy to provide
 1. Explain how feedback will be used to improve the system
 
-Here's how you might implement segmented negative feedback collection:
+How you might implement segmented negative feedback collection:
 
 ## Learning from User Behavior: The Implicit Feedback Gold Mine
 
@@ -301,9 +345,9 @@ This approach is particularly valuable for PDF-heavy domains like legal, medical
 ### Citation Implementation Patterns
 
 > **Preventing Hallucinations**
-> 
+>
 > Skylar Payne emphasizes that hallucination remains a critical challenge, especially in sensitive domains. His most effective approach: "Force the LLM to provide inline citations, validate that each citation exists in the retrieved documents, and semantically validate that each citation actually supports the claimed content."
-> 
+>
 > This is particularly critical for healthcare, legal, and financial applications. [See more anti-patterns to avoid →](../talks/rag-antipatterns-skylar-payne.md)
 
 !!! info "XML-Based Citation Pattern"
@@ -361,7 +405,7 @@ Well-designed feedback mechanisms provide concrete benefits:
 
 Remember that small UX changes can make enormous differences in feedback collection rates. The most successful RAG applications aren't always those with the most sophisticated technology—they're the ones that most effectively learn from their users.
 
-In the next chapter, we'll explore how to reduce perceived latency through streaming and progressive responses, building on the feedback foundation to create a more engaging user experience.
+In the next chapter, explore how to reduce perceived latency through streaming and progressive responses, building on the feedback foundation to create a more engaging user experience.
 
 ### How This Chapter Connects Forward
 
@@ -484,5 +528,4 @@ Effective feedback collection is essential for systematic improvement of RAG sys
 1. GitHub Repository: [RAG-Feedback-Collection](https://github.com/microsoft/rag-feedback-collection) - Templates and examples for implementing feedback mechanisms in RAG applications
 
 ---
-
-
+````

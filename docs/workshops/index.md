@@ -5,16 +5,7 @@ description: Hands-on workshops for building self-improving RAG systems
 
 # Workshops
 
-These workshops walk you through building RAG systems that actually get better over time. If you're tired of deploying a RAG system only to watch it stagnate while users complain, this is for you.
-
-!!! success "🎓 Get the Complete Course - 20% Off"
-    This content is from the [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course on Maven.
-    
-    **Readers can enroll for 20% off with code: `EBOOK`**
-    
-    Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-    
-    [Enroll in the RAG Playbook Course - 20% Off](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK){ .md-button .md-button--primary }
+These workshops walk you through building RAG systems that get better over time through systematic measurement and improvement.
 
 ## What's Covered
 
@@ -103,12 +94,5 @@ A RAG system that:
 - Routes queries to the right specialized tools
 - Feels fast and responsive
 - Makes improvement decisions based on data
-- Doesn't break in weird ways
-- Works for teams, not just demos
-
-
-## Stay Updated
-
-Get access to our free 6-day email course on RAG improvement
-
-[Subscribe for updates](https://himprovingrag.com){ .md-button }
+- Handles edge cases gracefully
+- Works in production, not just demos

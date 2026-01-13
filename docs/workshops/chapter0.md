@@ -18,9 +18,6 @@ tags:
 
 **Successful RAG systems aren't projects that ship once—they're products that improve continuously.** The difference between teams that succeed and those that fail isn't the embedding model or vector database they choose. It's whether they treat RAG as a living product that learns from every user interaction, or as a static implementation that slowly decays in production.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
@@ -30,16 +27,16 @@ By the end of this chapter, you will be able to:
 3. Describe the improvement flywheel and where evaluation, feedback, and iteration fit
 4. Identify common failure modes of static RAG deployments and how to avoid them
 
-Look, I've been building AI systems for over a decade, and I keep seeing the same mistake: teams ship a RAG system, pat themselves on the back, and then watch it slowly fail in production.
+After a decade building AI systems, the same pattern repeats: teams ship a RAG system, celebrate the launch, then watch it slowly fail in production. User questions evolve. Data distributions shift. Edge cases multiply. Within weeks, the system that worked perfectly in demos struggles with real queries.
 
-This chapter is about avoiding that trap. We're going to talk about why the most successful RAG systems aren't the ones with the fanciest embeddings or the biggest context windows—they're the ones that get better every week based on what users actually do with them.
+This chapter shows how to avoid that trap. The most successful RAG systems aren't the ones with the fanciest embeddings or the biggest context windows—they're the ones that get better every week based on what users actually do with them. They treat deployment as the beginning of improvement, not the end of development.
 
-Here's what we'll cover:
+What we'll cover:
 
 - Why thinking of RAG as a "project" instead of a "product" dooms most implementations
-- How to steal ideas from recommendation systems (because that's really what RAG is)
+- How to apply ideas from recommendation systems (which is what RAG fundamentally is)
 - A practical framework for turning user frustration into system improvements
-- Real examples from companies that got this right (and wrong)
+- Real examples from organizations that succeeded (and failed)
 
 ## The Product Mindset: Why Most RAG Implementations Fail
 
@@ -47,11 +44,11 @@ When organizations implement RAG systems, they often approach it as a purely tec
 
 This approach inevitably leads to disappointment. The system works well for demo queries and simple use cases, but struggles with the complexity and diversity of real-world questions. As users encounter these limitations, they lose trust in the system and engagement drops. Without clear metrics or improvement processes, teams resort to ad-hoc tweaking based on anecdotal feedback.
 
-Here's the problem: they've built a technical implementation, not a product. And there's a huge difference.
+The core issue: they've built a technical implementation, not a product. There's a fundamental difference.
 
-I've built AI systems at Facebook, Stitch Fix, and worked with companies like HubSpot and Zapier. Whether it was recommendation systems that drove $50M in revenue or content safety systems processing millions of items, one pattern keeps showing up: **successful teams treat their AI systems as products that get better over time, not projects that ship and stop.**
+Across recommendation systems, content moderation, and information retrieval applications, one pattern consistently emerges: **successful teams treat their AI systems as products that get better over time, not projects that ship and stop.**
 
-Here's a quick way to tell which mindset a team has:
+Here's how to identify which mindset a team has:
 
 **Implementation Mindset:**
 
@@ -73,9 +70,9 @@ The product mindset recognizes that launching your RAG system is just the beginn
 
 ## RAG as a Recommendation Engine
 
-Here's the mental shift that changed everything for me: stop thinking about RAG as a pipeline of retrieval → augmentation → generation. Start thinking about it as a **recommendation engine wrapped around language models**.
+A useful mental model: stop thinking about RAG as a pipeline of retrieval → augmentation → generation. Start thinking about it as a **recommendation engine wrapped around language models**.
 
-Once you make this shift, everything becomes clearer. You stop obsessing over prompt templates and start focusing on what actually matters: getting the right information in front of the LLM.
+This reframing clarifies what matters. Instead of obsessing over prompt templates, focus on getting the right information in front of the LLM.
 
 ```mermaid
 flowchart TD
@@ -243,59 +240,57 @@ They added a simple feature: when someone asks that, the AI recommends the three
 
 ### A Real Example: Legal Tech RAG
 
-Let me walk you through how this played out with a legal tech company I worked with:
+Consider how this played out with a legal tech company building case law search:
 
-**Starting point:** Basic RAG with standard embeddings. Lawyers complained it "never found the right cases."
+**Month 1 - Baseline:** Basic RAG with standard embeddings. Lawyers complained it "never found the right cases." We generated 200 test queries from their actual case law. Baseline accuracy: 63%.
 
-**Step 1:** We generated 200 test queries from their actual case law. Baseline accuracy: 63%. Not great.
+**Month 2 - First Iteration:** Testing different approaches revealed that legal jargon broke standard chunking. Legal citations like "42 U.S.C. § 1983" were being split across chunks, destroying meaning. Fixed the chunking strategy to respect legal citation patterns. Accuracy improved to 72%.
 
-**Step 2:** Tested different approaches. Turns out legal jargon breaks standard chunking. Fixed that, got to 72%.
+**Month 3 - Deployment:** Shipped it with thumbs up/down buttons and tracked what lawyers actually copied. This wasn't just feedback—it was real usage data showing which answers were valuable enough to use in briefs.
 
-**Step 3:** Shipped it and watched what lawyers actually did. Added thumbs up/down buttons and tracked what they copied.
+**Months 4-5 - Pattern Discovery:** After 2 months and 5,000 queries, three distinct patterns emerged:
 
-**Step 4:** After 2 months and 5,000 queries, patterns emerged. Three main query types:
+- Case citations: 40% of queries, 91% accuracy (worked great)
+- Legal definitions: 35% of queries, 78% accuracy (acceptable)
+- Procedural questions: 25% of queries, 34% accuracy (total failure)
 
-- Case citations (worked great)
-- Legal definitions (OK)
-- Procedural questions (total failure)
+**Month 6 - Specialized Solutions:** Built dedicated retrieval strategies for each type. Case citations got exact matching on citation format. Definitions got a specialized glossary index. Procedural questions got a separate index built from court rules and practice guides. Overall accuracy jumped to 87%.
 
-**Step 5:** Built specialized handlers for each type. Overall accuracy hit 87%.
+**Ongoing - Strategic Focus:** Monitoring revealed procedural questions growing 3x faster than other types. That insight directed engineering focus for the next quarter.
 
-**Step 6:** Keep monitoring. Procedural questions growing 3x faster than others—that's where we focus next.
-
-End result: lawyers actually started using the system. Research time dropped 40%. But more importantly, we had a system for making it better every month.
+The outcome: lawyers actually started using the system daily. Research time dropped 40%. More importantly, the team had a systematic process for identifying and fixing problems every month. When new failure modes emerged, they had a playbook for addressing them.
 
 **Pro tip:** When something's not working, first ask: "Is this an inventory problem or a capabilities problem?"
 
-**Inventory problem:** You don't have the answer in your knowledge base
+**Inventory problem:** The answer doesn't exist in your knowledge base
 
-- Missing documents
-- Outdated info
-- Gaps in coverage
-- Fix: Add more/better content
+- Missing documents entirely
+- Outdated information replaced by newer versions
+- Gaps in content coverage
+- Fix: Add or update the missing content
 
-**Capabilities problem:** You have the answer but can't find it
+**Capabilities problem:** The answer exists but the system can't find it
 
-- Bad retrieval
-- Wrong search strategy
-- Can't understand the query
-- Fix: Improve how you search
+- Poor retrieval failing to match query to document
+- Wrong search strategy for the query type
+- Inability to understand query intent
+- Fix: Improve retrieval, understanding, or routing
 
-I've seen teams waste months improving retrieval when they simply didn't have the right documents. Don't be that team.
+Teams waste months improving retrieval algorithms when they simply lack the right documents. Before optimizing your embeddings or reranker, verify the answer actually exists in your knowledge base. Have a domain expert manually search for the answer. If they can't find it either, you have an inventory problem. No amount of better AI will fix missing data.
 
 ## Who This Is For
 
-Based on who's shown up to my workshops, you're probably:
+This content is designed for:
 
-- A technical leader trying to figure out why your RAG system isn't getting better
-- An engineer who built a RAG system and is now stuck maintaining it
-- Part of a team (engineering, data science, product) trying to make AI actually useful
+- Technical leaders working to improve underperforming RAG systems
+- Engineers responsible for maintaining and evolving RAG implementations
+- Cross-functional teams (engineering, data science, product) building AI applications
 
-I've taught this to teams at tiny startups and big tech companies. The problems are surprisingly similar—everyone's trying to move from "we built RAG" to "our RAG system gets better every week."
+The challenges are remarkably similar across organizations of different sizes—most teams are trying to move from "we built RAG" to "our RAG system gets better every week."
 
 ## What's Coming Next
 
-Each chapter builds on the last, taking you through the complete improvement flywheel. Everything includes code and examples you can steal for your own projects.
+Each chapter builds on the last, taking you through the complete improvement flywheel. All concepts include code and practical examples.
 
 Here's what we'll cover in the upcoming chapters:
 
@@ -353,7 +348,6 @@ Next up: we'll dive into the first step of the flywheel—creating synthetic dat
 
 ---
 
-_Note: I've used this approach with companies across legal, finance, healthcare, and e-commerce. The details change, but the core flywheel stays the same: focus on users, measure what matters, and improve based on data instead of hunches._
+_Note: This approach has been applied across legal, finance, healthcare, and e-commerce domains. The details change, but the core flywheel stays the same: focus on users, measure what matters, and improve based on data instead of hunches._
 
 ---
-

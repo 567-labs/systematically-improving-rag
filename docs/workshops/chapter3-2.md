@@ -10,10 +10,6 @@ author: Jason Liu
 
 **Perceived performance beats actual performance—users will wait 8 seconds with progress bars but abandon after 3 seconds of silence.** Streaming isn't just about showing text faster. It's about maintaining user engagement through the entire retrieval-generation pipeline. Implement streaming early because retrofitting it later adds weeks to your development cycle.
 
-!!! info "Learn the Complete RAG Playbook"
-    All of this content comes from my [Systematically Improving RAG Applications](https://maven.com/applied-llms/rag-playbook?promoCode=EBOOK) course. Readers get **20% off** with code EBOOK. Join 500+ engineers who've transformed their RAG systems from demos to production-ready applications.
-
-
 ## Learning Objectives
 
 By the end of this chapter, you will be able to:
@@ -29,11 +25,11 @@ These objectives build directly on the feedback collection mechanisms from Chapt
 
 ## Introduction
 
-RAG applications face a fundamental challenge: the processes involved—retrieval, generation, validation, citation lookup—take time. Even accurate answers lose value if users get frustrated waiting for them.
+RAG applications face a fundamental challenge: the processes involved—retrieval, generation, validation, citation lookup—take time. Even accurate answers lose value if users abandon the system out of frustration.
 
-Perceived performance often matters more than actual performance. Users perceive responsive systems as faster even when the total completion time is identical. This chapter covers practical approaches to address this challenge.
+**Building on Chapter 3.1**: Remember how changing feedback copy from "How did we do?" to "Did we answer your question?" increased feedback 5x? Streaming has even more dramatic impact. Users perceive responsive systems as faster even when total completion time is identical. More importantly, streaming creates natural moments to collect feedback throughout the interaction, not just at the end.
 
-**Understanding the Perception Gap**: Perceived wait times can be up to 25% longer than actual wait times when users have no visibility into system progress. Showing meaningful progress can make perceived wait times up to 40% shorter.
+Perceived performance often matters more than actual performance. Users perceive animated progress bars as 11% faster even with identical wait times. Showing meaningful progress can make perceived wait times 40% shorter. This chapter covers practical approaches to turn waiting time from frustration into engagement.
 
 > "Streaming has become table stakes in modern LLM applications. Users expect responses instantly, and implementing streaming significantly improves both actual and perceived performance. Only about 20% of companies I work with have a good understanding of how to implement streaming effectively."
 
@@ -52,7 +48,7 @@ These techniques not only improve user experience but also lead to higher engage
 \- Applications with engaging loading screens report higher satisfaction scores
 \- Facebook discovered that skeleton screens significantly reduced perceived load times, resulting in better user retention and engagement
 
-The strategies we'll cover in this chapter are becoming essential components of modern LLM applications. By the end of this chapter, you'll understand how to turn waiting time from a point of frustration to an opportunity for engagement and trust-building.
+The strategies covered in this chapter are becoming essential components of modern LLM applications. By the end of this chapter, you'll understand how to turn waiting time from a point of frustration to an opportunity for engagement and trust-building.
 
 ## Animation and Perceived Performance
 
@@ -95,7 +91,7 @@ My recommendation is to stream everything when possible. You can:
 - Stream tool calls and function arguments to show intermediate states
 - Implement skeleton screens (like those used by Facebook, LinkedIn, and Slack) to improve perceived latency
 
-> "I've seen companies experience 30-40% higher feedback collection rates after implementing effective streaming compared to traditional 'wait and display' approaches. This creates a cycle where better performance leads to more feedback, which enables more targeted improvements."
+> "Studies show companies experience 30-40% higher feedback collection rates after implementing effective streaming compared to traditional 'wait and display' approaches. This creates a cycle where better performance leads to more feedback, which enables more targeted improvements."
 
 ```mermaid
 sequenceDiagram
@@ -193,9 +189,7 @@ async def stream_query_response(request: Request):
     )
 ```
 
-On the frontend, you'll need to handle Server-Sent Events (SSE) or WebSockets to receive and display the streamed content:
-
-
+On the frontend, need to handle Server-Sent Events (SSE) or WebSockets to receive and display the streamed content:
 
 ### Showing Function Call Arguments
 
@@ -219,7 +213,7 @@ Libraries like Instruct and modern LLM frameworks now support streaming structur
 - Build dynamic UI that renders each component as it becomes available
 ```
 
-Here's how you might implement structured streaming for a response that includes an answer, citations, and follow-up questions:
+How you might implement structured streaming for a response that includes an answer, citations, and follow-up questions:
 
 ```python
 async def stream_structured_response(query: str):
@@ -270,8 +264,6 @@ async def stream_structured_response(query: str):
 
 On the frontend, you'd handle this structured stream by updating different UI components based on the message type:
 
-
-
 This approach creates a dynamic, engaging experience where different parts of the response appear progressively, keeping users engaged throughout the generation process.
 
 ## Meaningful Interstitials: Making Waiting Engaging
@@ -305,6 +297,7 @@ For RAG applications, skeleton screens can be particularly effective when showin
 **Generic Interstitial:** "Loading..."
 
 **Meaningful Interstitial:**
+
 - "Searching 382,549 documents in our knowledge base..."
 - "Finding relevant precedent cases from 2021-2022..."
 - "Analyzing 3 legal frameworks that might apply to your question..."
@@ -316,7 +309,7 @@ Meaningful interstitials should:
 1. Update dynamically to show progress
 1. Maintain a confident, authoritative tone
 
-Here's how you might implement meaningful interstitials:
+How you might implement meaningful interstitials:
 
 ```python
 async def generate_interstitials(query: str):
@@ -380,8 +373,6 @@ async def generate_interstitials(query: str):
 
 On the frontend, you'd display these interstitials in sequence during the waiting period:
 
-
-
 ## Optimizing Actual Performance
 
 While perceived performance is critical, we shouldn't neglect actual performance optimizations. Here are several strategies for reducing real latency in RAG applications:
@@ -444,8 +435,6 @@ Here's a simple but effective approach for Slack bots:
 
 1. **Feedback Collection**: Pre-fill emoji reactions (👍 👎 ⭐) to prompt users for feedback on the response quality.
 
-
-
 !!! tip "Slack Feedback Collection"
 By pre-filling emoji reactions (👍 👎 ⭐), you increase the likelihood of receiving user feedback. This approach places feedback options directly in the user's view, rather than requiring them to take additional steps. In testing, this approach increased feedback collection rates by up to 5x compared to text-based feedback prompts.
 
@@ -473,7 +462,7 @@ These approaches work in concert to create a responsive, engaging RAG experience
 !!! tip "Implementation Priority"
 If you're at the start of your RAG implementation journey, prioritize streaming first. It's much easier to integrate from the beginning than to retrofit later. Next, focus on meaningful interstitials and skeleton screens. Finally, implement platform-specific optimizations for your particular usage context (web, Slack, mobile, etc.).
 
-In the next chapter, we'll build on these foundations by exploring quality-of-life improvements like interactive citations, chain-of-thought reasoning, and validation patterns. These elements further enhance the user experience while creating additional opportunities for feedback collection.
+In the next chapter, build on these foundations by exploring quality-of-life improvements like interactive citations, chain-of-thought reasoning, and validation patterns. These elements further enhance the user experience while creating additional opportunities for feedback collection.
 
 ## This Week's Action Items
 
@@ -616,5 +605,3 @@ Remember: If you only implement one improvement from this chapter, make it strea
 1. GitHub Repository: [React Skeleton Screens](https://github.com/danilowoz/react-content-loader) - Open-source library for implementing skeleton screens in React applications
 
 ---
-
-

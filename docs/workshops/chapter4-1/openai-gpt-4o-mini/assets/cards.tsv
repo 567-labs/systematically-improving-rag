@@ -1,0 +1,12 @@
+What is the 80/20 rule in query analysis?	The 80/20 rule in query analysis suggests that fixing 20% of query segments can solve 80% of user problems by targeting the most impactful areas for improvement.		topic-modeling query-analysis
+What is the purpose of K-means clustering in query segmentation?	To group similar user queries for targeted improvements.		clustering segmentation
+What is the purpose of the Expected Value formula in decision-making?	The Expected Value formula calculates the potential benefit of an action by multiplying its impact, the percentage of total volume it affects, and the probability of success. Formula: Expected Value = Impact × Volume % × Success Rate.		decision-making expected-value
+The formula for Expected Value is {{c1::Impact × Volume % × Success Rate}}.		formula expected-value
+K-means clustering is used to {{c1::group similar queries}} together.		clustering query-segmentation
+Define: 2x2 prioritization matrix	A tool to analyze query segments based on volume and satisfaction to identify areas needing improvement.		prioritization matrix
+Define: User adaptation patterns	Changes in user behavior to work around system limitations, which can mislead satisfaction metrics.		user-behavior metrics
+What is the first step in initial clustering?	Embed all your queries before applying K-means clustering.		initial-clustering query-analysis
+What is the action for Low Volume + High Satisfaction features?	Promote these features to increase user awareness.		prioritization promotion
+What indicates a need for cost-benefit analysis in the matrix?	Low Volume + Low Satisfaction features.		prioritization cost-benefit
+In the 2x2 matrix, High Volume + High Satisfaction features should be monitored only, while Low Volume + High Satisfaction features should be {{c1::promoted}}.		prioritization
+High Volume + Low Satisfaction features are in the {{c1::DANGER ZONE}} and require immediate attention.		prioritization

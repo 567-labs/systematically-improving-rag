@@ -21,8 +21,9 @@ Jason Liu
 **Mission:** Dismantle guesswork in AI development and replace it with structured, measurable, and repeatable processes.
 
 **Your Commitment:**
+
 - Stick with the material
-- Have conversations with teammates  
+- Have conversations with teammates
 - Make time to look at your data
 - Instrument your systems
 - Ask yourself: "What work am I trying to do?"
@@ -36,10 +37,12 @@ Jason Liu
 **Background:** Computer Vision, Computational Mathematics, Mathematical Physics (University of Waterloo)
 
 **Facebook:** Content Policy, Moderation, Public Risk & Safety
+
 - Built dashboards and RAG applications to identify harmful content
 - Computational social sciences applications
 
-**Stitch Fix:** Computer Vision, Multimodal Retrieval  
+**Stitch Fix:** Computer Vision, Multimodal Retrieval
+
 - Variational autoencoders and GANs for GenAI
 - **$50M revenue impact** from recommendation systems
 - $400K annual data curation budget
@@ -52,11 +55,13 @@ Jason Liu
 ## Current Focus
 
 **Why Consulting vs Building?**
+
 - Hand injury in 2021-2022 limited typing
 - Highest leverage: advising startups and education
 - Helping others build while hands recover
 
 **Client Experience:**
+
 - HubSpot, Zapier, Limitless, and many others
 - Personal assistants, construction AI, research tools
 - Query understanding, prompt optimization, embedding search
@@ -69,11 +74,13 @@ Jason Liu
 ## Who Are You?
 
 **Cohort Composition:**
+
 - **30%** Founders and CTOs
-- **20%** Senior Engineers  
+- **20%** Senior Engineers
 - **50%** Software Engineers, Data Scientists, PMs, Solution Engineers, Consultants
 
 **Companies Represented:**
+
 - OpenAI, Amazon, Microsoft, Google
 - Anthropic, NVIDIA, and many others
 
@@ -86,16 +93,19 @@ Jason Liu
 ## Course Structure: 6-Week Journey
 
 ### Week 1: Synthetic Data Generation
+
 - Create precision/recall evaluations
 - Start with text chunks → synthetic questions
 - Build baseline evaluation suite
 
 ### Week 2: Fine-Tuning and Few-Shot Examples
+
 - Convert evals to few-shot examples
 - Fine-tune models for better performance
 - Evaluate rerankers and methodologies
 
 ### Week 3: Deploy and Collect Feedback
+
 - Deploy system to real users
 - Collect ratings and feedback
 - Improve evals with real user data
@@ -106,17 +116,20 @@ Jason Liu
 
 ## Course Structure (continued)
 
-### Week 4: Topic Modeling and Segmentation  
+### Week 4: Topic Modeling and Segmentation
+
 - Use clustering to identify valuable topics
 - Decide what to double down on vs abandon
 - Focus resources on economically valuable work
 
 ### Week 5: Multimodal RAG Improvements
+
 - Incorporate images, tables, code search
 - Contextual retrieval and summarization
 - Target specific query segments
 
 ### Week 6: Function Calling and Query Understanding
+
 - Combine all systems with intelligent routing
 - Query → Path selection → Multimodal RAG → Final answer
 - Complete end-to-end orchestration
@@ -128,20 +141,24 @@ Jason Liu
 ## Learning Format
 
 **Asynchronous Lectures (Fridays)**
+
 - Watch videos on your schedule
 - Take notes and prepare questions
 
-**Office Hours (Tuesdays & Thursdays)**  
+**Office Hours (Tuesdays & Thursdays)**
+
 - Multiple time zones supported
 - Active learning and discussion
 - Question-driven sessions
 
 **Guest Lectures (Wednesdays)**
+
 - Industry experts and practitioners
 - Q&A with speakers
 - Real-world case studies
 
 **Slack Community**
+
 - Ongoing discussions
 - Peer support and collaboration
 
@@ -152,13 +169,15 @@ Jason Liu
 ## The Critical Mindset Shift
 
 ### ❌ Implementation Mindset
+
 - "We need to implement RAG"
-- Obsessing over embedding dimensions  
+- Obsessing over embedding dimensions
 - Success = works in demo
 - Big upfront architecture decisions
 - Focus on picking "best" model
 
-### ✅ Product Mindset  
+### ✅ Product Mindset
+
 - "We need to help users find answers faster"
 - Tracking answer relevance and task completion
 - Success = users keep coming back
@@ -176,6 +195,7 @@ Jason Liu
 **The Problem:** Treating RAG as a technical project, not a product
 
 **What Happens:**
+
 1. Focus on technical components (embeddings, vector DB, LLM)
 2. Consider it "complete" when deployed
 3. Works for demos, struggles with real complexity
@@ -218,14 +238,17 @@ User Query → Query Understanding → Multiple Retrieval Paths
 ## What This Means
 
 ### 1. Generation Quality = Retrieval Quality
+
 - World's best prompt + garbage context = garbage answers
 - Focus on getting the right information to the LLM
 
 ### 2. Different Questions Need Different Strategies
+
 - Amazon doesn't recommend books like electronics
 - Your RAG shouldn't use same approach for every query
 
-### 3. Feedback Drives Improvement  
+### 3. Feedback Drives Improvement
+
 - User interactions reveal what works
 - Continuous learning from real usage patterns
 
@@ -236,11 +259,13 @@ User Query → Query Understanding → Multiple Retrieval Paths
 ## What Does Success Look Like?
 
 ### Feeling of Success
+
 - **Less anxiety** when hearing "just make the AI better"
-- **Less overwhelmed** when told to "look at your data"  
+- **Less overwhelmed** when told to "look at your data"
 - **Confidence** in making data-driven decisions
 
 ### Tangible Outcomes
+
 - Identify high-impact tasks systematically
 - Prioritize and make informed trade-offs
 - Choose metrics that correlate with business outcomes
@@ -250,16 +275,44 @@ User Query → Query Understanding → Multiple Retrieval Paths
 
 ---
 
+## Real Example: Legal Tech RAG
+
+**The Journey:** Case law search system improvement
+
+**Month 1:** 63% accuracy
+
+- Initial deployment with generic embeddings
+- Users frustrated with missing relevant cases
+
+**Month 2:** 72% accuracy (+14%)
+
+- Better chunking strategy after error analysis
+- Identified citation patterns in failed queries
+
+**Month 3:** 87% accuracy (+38% total)
+
+- Added interactive citations (50,000+ examples)
+- Validation patterns preventing 80% of errors
+- **Trust score increased 62%**
+
+**Key Lesson:** Systematic improvement beats one-time optimization
+
+<!-- This is a real legal tech company building case law search. Month 1, they launched with 63% accuracy using generic embeddings. Users were frustrated with missing relevant cases. Month 2, they improved to 72% through better chunking strategy after doing error analysis. They identified specific citation patterns in failed queries. By Month 3, they reached 87% accuracy - a 38% improvement from start. How? They added interactive citations which generated over 50,000 examples for training. They implemented validation patterns that prevented 80% of errors before they reached users. Most importantly, user trust scores increased by 62%. The key lesson here is that systematic, measured improvement over three months beat any single optimization attempt. This is the product mindset in action. -->
+
+---
+
 ## The System Approach
 
 **What is a System?**
+
 - Structured approach to solving problems
-- Framework for evaluating technologies  
+- Framework for evaluating technologies
 - Decision-making process for prioritization
 - Methodology for diagnosing performance
 - Standard metrics and benchmarks
 
 **Why Systems Matter:**
+
 - Frees mental energy for innovation
 - Replaces guesswork with testing
 - Enables quantitative vs "feels better" assessments
@@ -274,7 +327,7 @@ User Query → Query Understanding → Multiple Retrieval Paths
 **The Reality:** RAG is a 4-step recommendation system
 
 1. **Multiple Retrieval Indices** (multimodal: images, tables, text)
-2. **Filtering** (top-k selection)  
+2. **Filtering** (top-k selection)
 3. **Scoring/Ranking** (rerankers, relevance)
 4. **Context Assembly** (prepare for generation)
 
@@ -291,6 +344,7 @@ User Query → Query Understanding → Multiple Retrieval Paths
 **Instead of:** "Make the AI better"
 
 **Ask:**
+
 - Why am I looking at this data?
 - What's the goal and hypothesis?
 - What signals am I looking for?
@@ -308,12 +362,14 @@ Like building muscle: track calories and workouts, don't just weigh yourself dai
 ## Course Commitments
 
 ### My Commitment to You
+
 - Be online and answer questions
 - Provide extensive office hours support
 - Share real-world experience and case studies
 - Connect you with industry experts
 
 ### Your Commitment
+
 - Engage with the material actively
 - Look at your own data and systems
 - Participate in discussions and office hours
@@ -332,6 +388,7 @@ Like building muscle: track calories and workouts, don't just weigh yourself dai
 The difference between success and failure isn't the embedding model or vector database you choose.
 
 It's whether you treat RAG as:
+
 - **❌ Static implementation** that slowly decays
 - **✅ Living product** that learns from every interaction
 

@@ -1,0 +1,410 @@
+{
+  "What are the most effective machine learning algorithms for classification tasks?": [
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_1",
+      "document_content": "Support Vector Machines (SVMs) are powerful supervised learning algorithms used for classification and regression tasks. They work by finding the optimal hyperplane that separates different classes with maximum margin.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses Support Vector Machines (SVMs), which are a specific type of machine learning algorithm used for classification tasks. This directly relates to the user's query about effective machine learning algorithms for classification. It provides relevant information about how SVMs function, which is valuable for understanding classification algorithms.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_2",
+      "document_content": "Random forests are ensemble learning methods that combine multiple decision trees to improve prediction accuracy and reduce overfitting. Each tree votes on the final prediction.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses random forests, which is a specific machine learning algorithm used for classification tasks. This directly relates to the user's query about effective machine learning algorithms for classification. It provides useful information about how random forests work, which is valuable for someone looking to understand classification algorithms.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_3",
+      "document_content": "Neural networks, inspired by biological neurons, consist of interconnected nodes that process information. Deep learning uses multi-layer neural networks to learn complex patterns from data.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses neural networks and deep learning but does not specifically address the most effective machine learning algorithms for classification tasks. It lacks direct information or context related to classification algorithms, making it not relevant to the query.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_4",
+      "document_content": "Gradient boosting algorithms like XGBoost and LightGBM build models sequentially, where each new model corrects errors from previous models. They're highly effective for structured data.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses gradient boosting algorithms, specifically XGBoost and LightGBM, which are well-known and effective machine learning algorithms for classification tasks. This directly addresses the user's query about effective algorithms for classification.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_5",
+      "document_content": "K-means clustering is an unsupervised machine learning algorithm that partitions data into k clusters by minimizing within-cluster sum of squares.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses K-means clustering, which is an unsupervised learning algorithm, while the query specifically asks about effective machine learning algorithms for classification tasks, which are typically supervised. Therefore, the document does not address the user's information need regarding classification algorithms.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_6",
+      "document_content": "The weather today is sunny with a high of 75 degrees. Perfect for outdoor activities like hiking or having a picnic in the park.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses the weather and outdoor activities, which is completely unrelated to machine learning algorithms or classification tasks. It does not provide any information relevant to the user's query.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_7",
+      "document_content": "Cooking pasta requires boiling water with salt, adding the pasta, and cooking for 8-12 minutes depending on the type. Always taste test for doneness.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses cooking pasta, which is unrelated to machine learning algorithms or classification tasks. It does not contain any relevant information or context that would help answer the user's query.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_8",
+      "document_content": "Stock market performance this quarter shows mixed results across sectors. Technology stocks gained 5% while energy stocks declined 3%.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses stock market performance and sector gains and losses, which is unrelated to machine learning algorithms or classification tasks. It does not provide any information relevant to the user's query about effective machine learning algorithms.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_9",
+      "document_content": "Python is a popular programming language often used in machine learning projects due to its extensive libraries like scikit-learn and TensorFlow.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses Python as a programming language used in machine learning but does not provide any information about specific machine learning algorithms for classification tasks, which is the focus of the query.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the most effective machine learning algorithms for classification tasks?",
+      "document_id": "ml_10",
+      "document_content": "The history of artificial intelligence dates back to the 1950s when researchers first began exploring computational approaches to intelligence.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses the history of artificial intelligence but does not provide any information about machine learning algorithms or their effectiveness for classification tasks, which is the focus of the query.",
+        "confidence": 0.9
+      }
+    }
+  ],
+  "What are some healthy breakfast recipes that are quick to prepare?": [
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_1",
+      "document_content": "Greek yogurt parfait with berries and granola provides protein, probiotics, and antioxidants. Layer Greek yogurt with fresh blueberries, strawberries, and a sprinkle of homemade granola.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document provides a specific healthy breakfast recipe (Greek yogurt parfait) that is quick to prepare and includes nutritious ingredients. It directly addresses the user's query for healthy breakfast recipes.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_2",
+      "document_content": "Overnight oats are a nutritious make-ahead breakfast. Combine rolled oats with milk, chia seeds, and your favorite fruits. Refrigerate overnight and enjoy in the morning.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document provides a specific healthy breakfast recipe (overnight oats) that is quick to prepare, as it can be made ahead of time and simply eaten in the morning. It includes key ingredients and preparation instructions, directly addressing the user's query for healthy breakfast recipes.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_3",
+      "document_content": "Avocado toast on whole grain bread topped with a poached egg creates a balanced meal with healthy fats, fiber, and protein to keep you energized all morning.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document provides a specific healthy breakfast recipe (avocado toast with a poached egg) that is quick to prepare and includes details about its nutritional benefits, which directly addresses the user's query for healthy breakfast recipes.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_4",
+      "document_content": "Smoothie bowls made with frozen fruits, spinach, and protein powder offer a vitamin-packed start to your day. Top with nuts, seeds, and fresh fruit.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document provides a specific healthy breakfast recipe (smoothie bowls) that is quick to prepare, aligning directly with the user's query for healthy breakfast recipes. It includes key ingredients and suggestions for toppings, making it practical and valuable for someone looking for quick breakfast ideas.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_5",
+      "document_content": "Whole grain pancakes made with oat flour and topped with fresh berries provide complex carbohydrates and fiber for sustained energy.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document describes a healthy breakfast recipe (whole grain pancakes) that is quick to prepare and includes nutritious ingredients (oat flour and fresh berries), which aligns directly with the user's query for healthy breakfast recipes that are quick to prepare.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_6",
+      "document_content": "Machine learning algorithms like neural networks require large datasets to train effectively and achieve good performance on new data.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses machine learning algorithms and their training requirements, which is unrelated to the user's query about healthy breakfast recipes. There is no connection to the topic of food or recipes, making it irrelevant to the information need.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_7",
+      "document_content": "Climate change affects global weather patterns, leading to more frequent extreme weather events and rising sea levels worldwide.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses climate change and its effects on weather patterns, which is completely unrelated to the user's query about healthy breakfast recipes. There is no connection to the topic of breakfast or recipes, making it irrelevant to the information need.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_8",
+      "document_content": "Software testing is crucial for ensuring code quality and preventing bugs from reaching production environments.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses software testing, which is unrelated to the query about healthy breakfast recipes. It does not provide any information or context relevant to the user's request for quick breakfast recipes.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_9",
+      "document_content": "Eggs are a complete protein source containing all essential amino acids. They can be prepared in many ways for breakfast.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses eggs as a protein source and mentions their versatility for breakfast, but it does not provide any specific healthy breakfast recipes or quick preparation methods. Therefore, it does not directly answer the user's query about healthy breakfast recipes that are quick to prepare.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are some healthy breakfast recipes that are quick to prepare?",
+      "document_id": "breakfast_10",
+      "document_content": "Coffee is one of the most popular morning beverages worldwide, containing caffeine which can help improve alertness and focus.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses coffee as a morning beverage but does not provide any breakfast recipes or information related to healthy breakfast options. It is not relevant to the user's query about quick and healthy breakfast recipes.",
+        "confidence": 0.9
+      }
+    }
+  ],
+  "How is climate change affecting global weather patterns and ecosystems?": [
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_1",
+      "document_content": "Rising global temperatures are causing polar ice caps to melt at unprecedented rates, contributing to sea level rise that threatens coastal communities worldwide.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses rising global temperatures and their impact on polar ice caps and sea level rise, which are directly related to climate change. This information is relevant as it provides context on how climate change is affecting global weather patterns and ecosystems, particularly in terms of rising sea levels and their implications for coastal communities.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_2",
+      "document_content": "Extreme weather events like hurricanes, droughts, and heatwaves are becoming more frequent and intense due to climate change, affecting agriculture and human settlements.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document directly addresses the query by discussing how climate change is leading to more frequent and intense extreme weather events, which is a key aspect of how climate change affects global weather patterns. Additionally, it mentions the impact on agriculture and human settlements, providing useful context for understanding the broader implications on ecosystems.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_3",
+      "document_content": "Ocean acidification caused by increased atmospheric CO2 is damaging coral reefs and marine ecosystems, threatening biodiversity and fishing industries.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses ocean acidification, which is a consequence of climate change due to increased atmospheric CO2. This directly relates to how climate change affects marine ecosystems, which is part of the user's query about the impact of climate change on ecosystems. Additionally, it touches on the broader implications for biodiversity and fishing industries, providing useful context for understanding the effects of climate change on global ecosystems.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_4",
+      "document_content": "Climate change is shifting precipitation patterns globally, leading to more severe droughts in some regions and increased flooding in others.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document directly addresses the query by discussing how climate change is affecting precipitation patterns, which is a key aspect of global weather patterns. It also mentions the consequences of these changes, such as severe droughts and increased flooding, which are relevant to understanding the impact on ecosystems.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_5",
+      "document_content": "Arctic wildlife like polar bears and seals face habitat loss as sea ice continues to decline due to warming temperatures.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses the impact of climate change on Arctic wildlife, specifically mentioning habitat loss due to warming temperatures. This directly relates to the query about how climate change affects ecosystems, providing specific examples of the consequences of changing weather patterns in the Arctic.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_6",
+      "document_content": "Artificial intelligence and machine learning are revolutionizing how we process and analyze large datasets in various industries.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses artificial intelligence and machine learning, which are unrelated to the query about climate change and its effects on global weather patterns and ecosystems. There is no connection to the topic of climate change, making the document irrelevant to the user's information need.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_7",
+      "document_content": "Mediterranean diet rich in olive oil, fish, and vegetables has been linked to numerous health benefits including reduced heart disease risk.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses the Mediterranean diet and its health benefits, which is unrelated to the query about climate change's effects on global weather patterns and ecosystems. There is no connection to the topic of climate change or its impacts.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_8",
+      "document_content": "Agile software development methodologies emphasize iterative development, collaboration, and responding to change over following a fixed plan.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses agile software development methodologies, which are unrelated to climate change, global weather patterns, or ecosystems. It does not provide any relevant information or context regarding the user's query.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_9",
+      "document_content": "Solar and wind energy technologies are becoming more affordable as governments and companies seek to reduce carbon emissions.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses solar and wind energy technologies and their affordability, which is not directly related to how climate change is affecting global weather patterns and ecosystems. It does not provide information or context relevant to the user's query about the impacts of climate change.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "How is climate change affecting global weather patterns and ecosystems?",
+      "document_id": "climate_10",
+      "document_content": "Weather prediction models use complex mathematical equations to forecast short-term atmospheric conditions.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses weather prediction models and their mathematical equations, which are not directly related to the effects of climate change on global weather patterns and ecosystems. It does not provide any information about climate change or its impacts, making it irrelevant to the query.",
+        "confidence": 0.9
+      }
+    }
+  ],
+  "What are the essential software engineering best practices for large codebases?": [
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_1",
+      "document_content": "Code reviews are essential for maintaining code quality, catching bugs early, and sharing knowledge among team members. They should be constructive and thorough.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses code reviews, which are a key software engineering best practice that contributes to maintaining code quality in large codebases. This directly relates to the query about essential software engineering best practices.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_2",
+      "document_content": "Version control systems like Git enable developers to track changes, collaborate effectively, and maintain a complete history of code modifications.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses version control systems, specifically Git, which is a crucial best practice in software engineering for managing large codebases. It highlights the importance of tracking changes and collaboration, both of which are essential for maintaining large codebases effectively. This directly relates to the query about software engineering best practices.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_3",
+      "document_content": "Test-driven development (TDD) involves writing tests before implementing features, leading to better code design and higher test coverage.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses test-driven development (TDD), which is a key software engineering practice that can be essential for managing large codebases. It directly relates to the query about software engineering best practices, as TDD contributes to better code design and higher test coverage, both of which are important in large projects.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_4",
+      "document_content": "Continuous integration and continuous deployment (CI/CD) pipelines automate testing and deployment processes, reducing manual errors and improving release velocity.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses CI/CD pipelines, which are related to software engineering practices, but it does not specifically address essential best practices for managing large codebases. It lacks direct information on best practices and is too focused on a specific aspect of software engineering without providing broader context or guidance relevant to the query.",
+        "confidence": 0.8
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_5",
+      "document_content": "Clean code principles emphasize readable, maintainable code with meaningful variable names, small functions, and clear documentation.",
+      "llm_score": {
+        "is_relevant": true,
+        "reasoning": "The document discusses clean code principles, which are essential best practices in software engineering that contribute to the maintainability and readability of large codebases. This directly relates to the query about software engineering best practices for large codebases.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_6",
+      "document_content": "Quinoa salad with roasted vegetables makes a nutritious lunch option packed with complete proteins and essential vitamins.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses a quinoa salad recipe and its nutritional benefits, which is completely unrelated to software engineering or best practices for managing large codebases. It does not contain any relevant information or context that would help answer the user's query.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_7",
+      "document_content": "Renewable energy sources like solar panels are becoming more efficient and cost-effective for residential use.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses renewable energy sources, specifically solar panels, which is unrelated to software engineering or best practices for managing large codebases. There is no connection to the query topic, and the content does not provide any useful information regarding software engineering.",
+        "confidence": 1.0
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_8",
+      "document_content": "Deep learning models require careful hyperparameter tuning to achieve optimal performance on specific tasks.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses deep learning models and hyperparameter tuning, which are not related to software engineering best practices for large codebases. It does not provide any information relevant to the user's query about software engineering.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_9",
+      "document_content": "Database design principles include normalization, proper indexing, and choosing appropriate data types for optimal performance.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses database design principles, which are not directly related to software engineering best practices for large codebases. It does not address the query's focus on software engineering practices, making it irrelevant to the user's information need.",
+        "confidence": 0.9
+      }
+    },
+    {
+      "question": "What are the essential software engineering best practices for large codebases?",
+      "document_id": "software_10",
+      "document_content": "Programming languages like Python and JavaScript are popular choices for web development due to their extensive ecosystems.",
+      "llm_score": {
+        "is_relevant": false,
+        "reasoning": "The document discusses programming languages popular for web development but does not address software engineering best practices for large codebases, which is the focus of the query.",
+        "confidence": 0.9
+      }
+    }
+  ]
+}

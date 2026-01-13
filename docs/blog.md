@@ -21,9 +21,13 @@ tags:
 
 ## The Problem That Started It All
 
-I'll never forget the panic in the engineering director's voice during our emergency call. "Our RAG system worked in demos," he said, "but now that it's in production, users are complaining that it can't answer basic questions about our own documentation. We've tried three different embedding models and tweaked our prompts dozens of times. Nothing helps. I don't feel good about launching this to all our customers."
+A legal tech company launched their case law search with 63% accuracy. Users were frustrated—missing relevant precedents, getting unrelated cases. The engineering team tried three different embedding models and tweaked prompts dozens of times. Nothing helped.
 
 The fundamental issue? Everyone was treating RAG as a one-time implementation project rather than an evolving product. They'd optimize for the wrong metrics, guess at solutions, and make random changes hoping something would stick.
+
+Three months later, through systematic measurement and improvement, they reached 87% accuracy. User trust scores increased 62%. They generated 50,000+ citation examples for continuous training. The difference? They adopted a product mindset with continuous feedback loops.
+
+This transformation didn't come from finding the perfect model or magical prompt. It came from systematic improvement guided by data.
 
 ## The Two Biases That Kill RAG Projects
 
@@ -31,16 +35,18 @@ Behind these surface-level mistakes lie two fundamental biases that kill more RA
 
 ### Absence Bias (Absence Blindness)
 
-You can't fix what you can't see. Sounds obvious, right? But I see teams obsess over generation quality while completely ignoring whether retrieval works at all.
+You can't fix what you can't see. Teams obsess over generation quality while ignoring whether retrieval works at all.
 
-I had a client spend three weeks fine-tuning prompts. When we finally checked, their retrieval system was returning completely irrelevant documents. No amount of prompt engineering can fix that.
+Real example: A construction company spent three weeks optimizing prompts for blueprint search. When they finally checked retrieval metrics, they found only 27% recall—the system wasn't even finding the right blueprints. No amount of prompt engineering could fix that.
+
+After switching focus to retrieval quality through vision model summaries, they reached 85% recall in four days. Later, they discovered 20% of queries involved counting objects, justifying investment in bounding box models that pushed counting accuracy to 92%.
 
 Questions teams forget to ask:
 
 - Is retrieval actually finding the right documents?
 - Are our chunks the right size?
 - Is our data extraction pipeline working?
-- Do we have separate metrics for retrieval vs generation?
+- Do we have separate metrics for retrieval versus generation?
 
 ### Intervention Bias
 
@@ -255,4 +261,3 @@ For a deeper dive into these concepts, check out the free 6-week email course on
 [Enroll in the Free 6-Day Email Course](https://improvingrag.com/){ .md-button .md-button--primary }
 
 ---
-

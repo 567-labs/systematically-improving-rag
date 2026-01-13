@@ -37,12 +37,14 @@ Jason Liu
 > "Often when I hear 'we need complex reasoning' it comes from lack of user empathy"
 
 **Hot Take:** This usually means:
+
 - Haven't looked at customer data in months
-- Never asked for specific feedback  
+- Never asked for specific feedback
 - Building generic solutions for broad problems
 - Focusing on features instead of outcomes
 
 **Key Questions to Ask:**
+
 - When was the last time we looked at data from customers?
 - When was the last time we read that feedback?
 - When was the last time we asked for that feedback?
@@ -91,6 +93,7 @@ Jason Liu
 **Real Impact:** I've worked with companies with $100M+ valuations that have fewer than 30 evaluations total
 
 **The Result:**
+
 - Disappointed leadership
 - Frustrated developers
 - Products that nobody uses
@@ -105,11 +108,13 @@ Jason Liu
 ## Lagging vs Leading Metrics
 
 ### Lagging Metrics: Easy to Measure, Hard to Improve
+
 - **What:** Past outcomes (weight, strength, churn, satisfaction)
 - **Characteristics:** Unresponsive, measures outputs
 - **Problem:** Shows results after it's too late to act
 
-### Leading Metrics: Hard to Measure, Easy to Improve  
+### Leading Metrics: Hard to Measure, Easy to Improve
+
 - **What:** Future predictors (calories, workouts, experiments)
 - **Characteristics:** Actionable, measures inputs
 - **Power:** Provides feedback on when and where to intervene
@@ -127,16 +132,19 @@ Jason Liu
 > "If you're feeling lost, plan to do a couple more experiments"
 
 **Focus Areas:**
+
 - How many experiments are we running?
 - What infrastructure investments improve velocity?
 - How can we brainstorm better experiment designs?
 
 **Success Pattern:** Doing the obvious thing over and over again
+
 - Like counting calories in vs calories out
 - Boring but effective
 - Way more boring than you think, but that's what success looks like
 
 **In Practice:**
+
 - Focus on how many experiments we're running
 - What infrastructure investments improve velocity?
 - How can we brainstorm better experiment designs?
@@ -149,11 +157,13 @@ Jason Liu
 ## Absence Blindness: You Don't Fix What You Can't See
 
 **Common Pattern:**
+
 - Everyone talks about generation quality and latency
 - Nobody checks if retrieval actually works
 - Focus on visible problems, ignore hidden ones
 
 **Hidden Issues We Miss:**
+
 - Is retrieval finding relevant documents?
 - Are text chunks properly extracted?
 - Do embeddings match query semantics?
@@ -171,17 +181,20 @@ Jason Liu
 ## Intervention Bias: Action Without Purpose
 
 **The Pattern:**
+
 - Switch between models randomly
 - Add prompt tweaks everywhere
 - Do things just to feel in control
 
 **Why This Fails:**
+
 - No specific hypothesis being tested
 - No metrics to validate improvements
 - "It depends on your data" - always
 - Trying to feel in control vs. being in control
 
 **The Reality:**
+
 - Pay consultants just to hear what you hope to hear
 - But the answer is always: "it depends on your data, your evaluations, and your benchmarks"
 
@@ -196,15 +209,19 @@ Jason Liu
 **Core Principle:** Everything from search applies to RAG
 
 ### Step 1: Basic RAG Setup
+
 Start with existing system
 
-### Step 2: Synthetic Data Generation  
+### Step 2: Synthetic Data Generation
+
 Create test questions for retrieval abilities
 
 ### Step 3: Fast Evaluations
+
 Unit-test-like assessments (precision, recall)
 
 ### Step 4: Real-World Data
+
 Collect actual user queries and feedback
 
 **Goal:** Build intuition through continuous experimentation
@@ -216,17 +233,20 @@ Collect actual user queries and feedback
 ## Why Retrieval Evals Beat Generation Evals
 
 ### Generation Evals: Too Subjective
+
 ```
 Q: "What is the powerhouse of the cell?"
 A1: "Mitochondria [1]"
 A2: "The powerhouse of the cell is the mitochondria, which..."
 A3: "Mitochondria are organelles that..."
 ```
+
 **Problem:** Which answer is "correct"? Too subjective.
 
 <!-- For every company that I worked with that did not come from a machine learning background, they started focusing on things like subjective generation evals way too early. In the long term, language models are going to improve their ability to synthesize new data in context, but it's our responsibility to be improving things like our search and retrieval evals. If we focus on generation evals, things like factuality become very subjective and confusing. -->
 
 ### Retrieval Evals: Objective and Clear
+
 ```
 Q: "What is the powerhouse of the cell?"
 Expected pages: [6, 9, 13]
@@ -242,16 +262,19 @@ Precision: 3/5 = 60%
 ## Retrieval Eval Benefits
 
 **Speed & Cost**
+
 - Seconds vs minutes/hours
 - Cheap vs expensive (no LLM judge needed)
 - Can run frequently vs infrequently
 
 **Scalability**
+
 - Hundreds/thousands of tests
 - Clear pass/fail criteria
 - No subjective interpretation
 
 **Actionability**
+
 - Test lexical vs semantic search
 - Evaluate reranker impact
 - Measure chunk extraction quality
@@ -263,20 +286,24 @@ Precision: 3/5 = 60%
 ## Precision and Recall Fundamentals
 
 ### Recall: Percentage of relevant documents found
+
 ```
 10 correct documents exist
 Retrieved 5, found 4 correct ones
 Recall = 4/10 = 40%
 ```
+
 **High recall:** System finds most relevant documents
 **Critical when:** Facts scattered across many documents
 
 ### Precision: Percentage of retrieved documents that are relevant
+
 ```
 Retrieved 10 documents
 2 are actually relevant
 Precision = 2/10 = 20%
 ```
+
 **High precision:** System avoids irrelevant results
 **Critical when:** Too much noise confuses the model
 
@@ -287,16 +314,19 @@ Precision = 2/10 = 20%
 ## Case Study 1: Research Interview Reports
 
 **Problem:** Consultants losing trust in AI-generated reports
+
 - "I know 6 people liked the product, but only 3 quotes showed up"
 - **Recall:** 3/6 = 50%
 
 **The Problem in Detail:**
+
 - Consultants do 15-30 research interviews with experts
 - AI generates reports from interview data
 - Customer: "I know 6 people liked the product, but only 3 quotes showed up"
 - **Trust broken:** "I know there were 6. There's something wrong."
 
 **Solution Process:**
+
 1. Manual question-chunk dataset creation
 2. Focused on preprocessing experiments (our hypothesis)
 3. 3-4 experiments on preprocessing text chunks before ingestion
@@ -312,10 +342,12 @@ Precision = 2/10 = 20%
 ## Case Study 2: Construction Blueprint Search
 
 **Problem:** Workers couldn't find relevant blueprints
+
 - **Recall:** 27% for finding correct images
 - Critical documents going unfound
 
 **The Detailed Process:**
+
 1. Built synthetic dataset of blueprint queries
 2. **Hypothesis:** Better image summaries and captions needed
 3. Used visual language models to create captions and descriptions
@@ -323,10 +355,16 @@ Precision = 2/10 = 20%
 5. Generated hypothetical questions for each blueprint
 6. Tested ability to recall correct document and answer questions
 
-**Results:** 4 days, ~12 prompts, 3 models → 27% to 85% recall
+**The 4-Day Timeline:**
+
+- **Day 1-2:** Created task-specific summaries (count rooms, list dimensions, identify features)
+- **Day 3-4:** Implemented separate "search summaries" tool for spatial queries
+- **Result:** 16% → 85% recall (69 percentage point improvement)
 
 **Bonus Discovery:** 20% of queries were about counting objects in blueprints
+
 - Justified investment in bounding box models
+- Further improved counting queries to 92% accuracy
 - Applied technique to tables, documents, other artifacts
 
 **Key Lesson:** Highly specific prompts for synthetic summary generation + domain expertise
@@ -340,12 +378,14 @@ Precision = 2/10 = 20%
 **Before Users:** Create synthetic questions to test systems
 
 **Benefits:**
+
 - Test edge cases before they happen
 - Build confidence in system capabilities
 - Establish baseline performance metrics
 - Enable rapid iteration cycles
 
 **Simple Starting Process:**
+
 1. Take a random text chunk
 2. Ask LLM to generate a question this chunk answers
 3. Verify that retrieval finds this chunk when searching the generated question
@@ -353,6 +393,7 @@ Precision = 2/10 = 20%
 5. Recall becomes a very binary metric
 
 **Advanced Process (with user data):**
+
 1. Use user queries as few-shot examples for generation
 2. Generate chunks from queries and test retrievability
 3. Use LLM as ranker to produce weak ranking labels
@@ -368,32 +409,34 @@ Precision = 2/10 = 20%
 ## Building Your First Evaluation Set
 
 **Start Simple:**
+
 ```python
 test_cases = [
     {
-        "query": "How to contact Jason?", 
+        "query": "How to contact Jason?",
         "expected_chunks": ["contact_info_page_1", "about_page_3"]
     },
     {
         "query": "What is the powerhouse of the cell?",
-        "expected_chunks": ["biology_chapter_6", "cell_structure_page_9"] 
+        "expected_chunks": ["biology_chapter_6", "cell_structure_page_9"]
     }
 ]
 
 def evaluate_retrieval(query, expected_chunks):
     retrieved = retrieval_system.search(query, top_k=10)
     retrieved_ids = [chunk.id for chunk in retrieved]
-    
+
     hits = len(set(expected_chunks) & set(retrieved_ids))
     recall = hits / len(expected_chunks)
     precision = hits / len(retrieved_ids)
-    
+
     return recall, precision
 ```
 
 ## Example Prompt for Question Generation
 
 **Domain-Specific Product Search Example:**
+
 ```
 You are generating questions for product search.
 Given this product description: [PRODUCT_DESCRIPTION]
@@ -401,7 +444,7 @@ Context: [OTHER_CONTEXT_ABOUT_TEXT_DATA]
 
 Generate questions that would retrieve this product, such as:
 - Comparison questions
-- Pattern recognition questions  
+- Pattern recognition questions
 - Feature-specific questions
 
 Example questions: [FEW_SHOT_EXAMPLES]
@@ -421,15 +464,18 @@ Bake in domain knowledge about:
 ## Common Pitfalls to Avoid
 
 **1. Oversimplification**
+
 - Don't aim for 100% recall - probably means test cases too simple
 - Define dynamic datasets vs static datasets
 - As scores improve, add more complex examples
 
 **2. Neglecting Real Data**
+
 - If you have real user data, don't neglect it
 - Include it in your dataset for higher quality testing
 
-**3. Production Misalignment** 
+**3. Production Misalignment**
+
 - Ensure search implementations match production exactly
 - No misalignment in configuration or specifications
 - Test what you actually ship
@@ -441,21 +487,25 @@ Bake in domain knowledge about:
 ## This Week's Homework
 
 **Step 1: Audit Current State**
+
 - How many evaluations do you currently have?
 - What metrics are you tracking?
 - Are they leading or lagging metrics?
 
 **Step 2: Create Your First Eval Set**
+
 - 10-20 query/expected-chunk pairs
 - Focus on your most common use cases
 - Test current retrieval performance
 
 **Step 3: Run Your First Experiment**
+
 - Change one thing (chunk size, embedding model, etc.)
 - Measure before and after performance
 - Document what you learned
 
 **Experiment Ideas:**
+
 - Try BM25 and full-text search (if using LanceDB/ChromaDB)
 - Test different embedding models
 - Experiment with chunking strategies
@@ -472,6 +522,7 @@ Bake in domain knowledge about:
 ## Next Week Preview: Fine-tuning
 
 **Session 2 Focus:**
+
 - When and how to fine-tune embedding models
 - Building relevancy into your representations
 - Moving beyond off-the-shelf solutions
@@ -486,12 +537,14 @@ Bake in domain knowledge about:
 ## Key Takeaways
 
 ### Mindset Shifts
+
 1. **Experiments over features** - measure velocity of learning
-2. **Leading over lagging metrics** - control inputs, not just outputs  
+2. **Leading over lagging metrics** - control inputs, not just outputs
 3. **Retrieval over generation** - fix what you can't see first
 4. **Specific over generic** - build superpowers, not generic tools
 
 ### Action Items
+
 1. **Count your experiments** - how many can you run this week?
 2. **Build synthetic data** - before you have real users
 3. **Focus on recall first** - can you find the right documents?
@@ -504,16 +557,19 @@ Bake in domain knowledge about:
 ## Remember: Fake It Till You Make It
 
 **The Data Flywheel:**
+
 - Synthetic data → Fast evaluations → Better intuition → More experiments → Better product
 
 **Success Metrics:**
+
 - Number of experiments run per week
-- Precision and recall improvements  
+- Precision and recall improvements
 - Customer trust and satisfaction growth
 
 **Foundation First:** Build the evaluation infrastructure that will guide all future improvements
 
 **Collection Strategy:**
+
 - Start simple: Google Sheets for valuable labels
 - Every demo, user interview, thumbs up/down = gold data
 - Later: Use tools like Braintrust for programmatic collection
@@ -529,12 +585,13 @@ Bake in domain knowledge about:
 ## Thank You
 
 **Questions for office hours:**
+
 - How to generate synthetic data for your domain?
 - What's a good starting number of evaluations?
 - How to convince leadership to invest in metrics?
 
 **Next week:** From measuring relevancy to building it
 
-*maven.com/applied-llms/rag-playbook*
+_maven.com/applied-llms/rag-playbook_
 
 <!-- We're still learning who you are. As we learn everyone's technical levels, we'll be able to dig deeper in these office hours and calibrate to everyone's level. So make sure to ask questions on Slack. Remember, we're trying to establish baselines. With this, we'll be able to use the techniques we learn in sessions four, five, and six, and really start testing different interventions and seeing which ones make a real difference in our metrics. Most importantly, by using these benchmarks, we can also reject interventions - we don't have to add superstitious interventions that become tech debt too quickly. -->

@@ -1,0 +1,18 @@
+{
+  "What are the most effective machine learning algorithms for classification tasks?": [
+    {
+      "document_id": "ml_1",
+      "human_score": true,
+      "llm_score": true,
+      "agreement": true,
+      "llm_confidence": 0.9
+    },
+    {
+      "document_id": "ml_2",
+      "human_score": false,
+      "llm_score": true,
+      "agreement": false,
+      "llm_confidence": 0.9
+    }
+  ]
+}

@@ -17,7 +17,7 @@ Jason Liu
 **Combining Search Indices into a Cohesive Application**
 
 - Query routing vs. retrieval indices
-- Query routing main challenges and solutions  
+- Query routing main challenges and solutions
 - Testing and evaluation strategies
 - UI considerations for human-AI interaction
 - Food for thought and practical applications
@@ -31,12 +31,14 @@ Jason Liu
 ## Building on Previous Sessions
 
 **Sessions 4-5: Individual Search Indices**
+
 - Documents, images, text-to-SQL
 - Two improvement strategies:
   1. **Structured Data Extraction**
   2. **Text Summaries for Search**
 
 **Today: Combination Strategy**
+
 - Intelligent query routing
 - Parallel tool calling
 - Human-AI collaboration
@@ -50,11 +52,13 @@ Jason Liu
 **Scenario:** Construction company searches blueprint images
 
 ### Step 1: Extract into Index
+
 - Blueprint extractor (OCR → description + date)
 - Structured database storage
 - Searchable fields
 
 ### Step 2: Define Search Tool
+
 ```python
 class SearchBlueprint(BaseModel):
     description: str
@@ -71,6 +75,7 @@ class SearchBlueprint(BaseModel):
 **Key Insight:** Retrieval methods = REST API methods
 
 **Why this matters:**
+
 - **Modularity:** Multiple APIs query same DB differently
 - **Team Scalability:** Individual teams per API type
 - **Clean Boundaries:** Interface, implementation, routing
@@ -84,13 +89,15 @@ class SearchBlueprint(BaseModel):
 ## Three-Layer Architecture
 
 ### 1. Interface Layer
+
 ```python
 class SearchText(BaseModel):
     search_query: str
     filter_by_type: Literal["contracts", "proposals", "bids", "all"]
 ```
 
-### 2. Implementation Layer  
+### 2. Implementation Layer
+
 ```python
 async def execute(self):
     q = table.search(query=self.search_query)
@@ -100,6 +107,7 @@ async def execute(self):
 ```
 
 ### 3. Gateway Layer
+
 ```python
 tools = [SearchBlueprint, SearchText, AnswerQuery]
 # Route → Execute → Synthesize
@@ -112,14 +120,17 @@ tools = [SearchBlueprint, SearchText, AnswerQuery]
 ## Team Organization Benefits
 
 **Interface Team**
+
 - Tool segmentation and design
 - A/B testing configurations
 
-**Implementation Team**  
+**Implementation Team**
+
 - Per-tool performance optimization
 - Better embeddings, ranking models
 
 **Gateway Team**
+
 - Tool routing and orchestration
 - Prompt engineering, model selection
 
@@ -130,14 +141,15 @@ tools = [SearchBlueprint, SearchText, AnswerQuery]
 ## Parallel Tool Calling
 
 **Why parallel tools are powerful:**
+
 - **Speed:** Concurrent searches
-- **Comprehensiveness:** Blueprint + text simultaneously  
+- **Comprehensiveness:** Blueprint + text simultaneously
 - **Composability:** Search + clarification + answers
 
 ```python
 class ToolSuite(BaseModel):
     search_blueprints: Optional[SearchBlueprint]
-    search_text: Optional[SearchText]  
+    search_text: Optional[SearchText]
     clarify_question: Optional[ClarifyQuestion]
     answer_with_citations: Optional[AnswerQuery]
 ```
@@ -151,14 +163,16 @@ class ToolSuite(BaseModel):
 **Same process, applied again:**
 
 ### Step 1: Create Test Dataset
+
 ```python
 example_queries = [
     ("Find blueprints for city hall from 2010", ["search_blueprints"]),
-    ("Show me contract proposals", ["search_text"]),  
+    ("Show me contract proposals", ["search_text"]),
 ]
 ```
 
 ### Step 2: Focus on Recall Metrics
+
 - **Data is crucial** for tool evaluation
 - **Precision matters later** (avoid wasted compute)
 - **Synthetic data generation** requires good descriptions
@@ -170,6 +184,7 @@ example_queries = [
 ## Dynamic Few-Shot Examples
 
 ### V0: Hard-coded Examples
+
 ```python
 # 10-40 examples per tool
 search_blueprint_examples = [
@@ -179,8 +194,9 @@ search_blueprint_examples = [
 ```
 
 ### Advanced: Search-Based Retrieval
+
 1. **Build Example Database:** Query → tool mappings
-2. **Runtime Retrieval:** Find relevant historical examples  
+2. **Runtime Retrieval:** Find relevant historical examples
 3. **Dynamic Prompting:** Inject examples into prompt
 4. **Continuous Improvement:** More users = better examples
 
@@ -189,15 +205,19 @@ search_blueprint_examples = [
 ## The Complete RAG Improvement System
 
 ### 1. Synthetic Data Flywheel
+
 Generate query-to-tool datasets for evaluation
 
-### 2. Establish Recall Metrics  
+### 2. Establish Recall Metrics
+
 Per-tool evaluation, system-wide metrics
 
 ### 3. Iterate on Few-Shot Examples
+
 Static → Dynamic, 10-40 examples per tool
 
 ### 4. Build Example Search System
+
 Store successful mappings, retrieve optimal examples
 
 **Key:** Don't be surprised by 10-40 examples per tool!
@@ -210,32 +230,35 @@ Store successful mappings, retrieve optimal examples
 
 **Problem:** 65% overall recall masks individual tool failures
 
-| Expected Tools | Predicted | Issue |
-|---|---|---|
-| [search_text; search_blueprints] | [search_text] | Missing blueprints |
-| [search_blueprints] | [search_text] | Wrong tool |
+**Construction Company Real Example:**
 
-**Root Cause:** `search_blueprints` has 0% recall!
+- Overall: 65% recall (looks mediocre)
+- Individual retrievers when correctly selected:
+  - `search_blueprints`: 85% recall
+  - `search_text`: 78% recall
+  - `search_schedule`: 82% recall
+- **Root cause**: Router only 67% accurate at tool selection!
 
-**Solutions:**
-- Better tool descriptions
-- Targeted few-shot examples  
-- Address class imbalance
+**Solution:** Added 40 examples per tool → 95% routing accuracy
+**Result:** 95% × 82% = 78% overall (13 point improvement)
 
-<!-- This is a critical debugging pattern. You might see 65% overall recall, but when you break it down per tool, you discover that search_blueprints has 0% recall while search_text is working fine. The system looks decent overall but one tool is completely failing. This is why you can't just look at system-wide metrics - you need per-class recall analysis. Once you know the specific problem, you can have a targeted intervention with better examples specifically for the failing tool. -->
+**Key Lesson:** The problem was routing, not retrieval!
+
+<!-- This is a critical debugging pattern with a real example. The construction company saw 65% overall recall. When they broke it down per tool, they discovered individual retrievers were actually good (78-85%). The real problem was the router only achieving 67% accuracy in selecting the right tool. By adding more examples per tool, they improved routing to 95%. The math: 95% routing × 82% average retrieval = 78% overall - a 13 percentage point improvement just from fixing routing. This is why you can't just look at system-wide metrics - you need per-class recall analysis to know whether to fix routing or retrieval. -->
 
 ---
 
 ## Challenge 2: Tool Confusion Matrix
 
-| | Predicted: blueprints | Predicted: text |
-|---|---|---|
-| **Actual: blueprints** | 5 | 4 |  
-| **Actual: text** | 0 | 9 |
+|                        | Predicted: blueprints | Predicted: text |
+| ---------------------- | --------------------- | --------------- |
+| **Actual: blueprints** | 5                     | 4               |
+| **Actual: text**       | 0                     | 9               |
 
 **Blueprint queries misclassified as text search**
 
 **Systematic Debugging:**
+
 1. Filter for failures
 2. Pattern analysis
 3. Delineation examples
@@ -251,11 +274,13 @@ Store successful mappings, retrieve optimal examples
 **Critical Issue:** Test examples in few-shot prompts
 
 **Why this happens:**
+
 - Limited data (dozens of examples)
 - Overlap between train/test
 - Synthetic data similarity
 
 **Consequences:**
+
 - Overestimated performance
 - Users see few-shot examples as answers
 - Production failures
@@ -269,6 +294,7 @@ Store successful mappings, retrieve optimal examples
 ## Understanding System Performance
 
 ### The Core Equation
+
 ```
 P(Correct chunk found) = P(Correct chunk | correct retriever) × P(correct retriever)
 ```
@@ -277,6 +303,7 @@ P(Correct chunk found) = P(Correct chunk | correct retriever) × P(correct retri
 **Session 6:** Router/gateway performance
 
 **This identifies your limiting factor:**
+
 - Router problem → Better prompts, examples
 - Retriever problem → Better embeddings, filtering
 
@@ -290,12 +317,12 @@ P(Correct chunk found) = P(Correct chunk | correct retriever) × P(correct retri
 P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ```
 
-| Component | Represents | Improve With |
-|---|---|---|
-| P(query) | UI Design & Education | Better UX, training |
-| P(success) | Overall App Quality | Satisfaction, reliability |
-| P(success \| correct tool) | Retrieval Quality | Embeddings, ranking |  
-| P(correct tool \| query) | Router Quality | Prompts, examples |
+| Component                  | Represents            | Improve With              |
+| -------------------------- | --------------------- | ------------------------- |
+| P(query)                   | UI Design & Education | Better UX, training       |
+| P(success)                 | Overall App Quality   | Satisfaction, reliability |
+| P(success \| correct tool) | Retrieval Quality     | Embeddings, ranking       |
+| P(correct tool \| query)   | Router Quality        | Prompts, examples         |
 
 **Strategic:** Segmentation analysis → research vs product roadmap
 
@@ -308,8 +335,9 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 **Don't Force Chat When Tools Are Better**
 
 **Examples of specialized interfaces:**
+
 - **YouTube:** Video search index
-- **Google Maps:** Directions index  
+- **Google Maps:** Directions index
 - **LinkedIn:** Professional network
 - **Google:** Everything else
 
@@ -322,12 +350,14 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ## JSON Schema → Form Generation
 
 **Technical Implementation:**
+
 - Each tool = JSON schema
 - Auto-generate forms for humans
 - Users review/correct parameters
 - Enable AI + human access
 
 **The P(query) Factor:**
+
 - Expert users → P(correct tool) = 100%
 - Why delegate to AI?
 - Offer chat AND structured search
@@ -337,6 +367,7 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ## Human-AI Training Loop
 
 **User interactions become training data:**
+
 - **Click-through data:** Which results selected?
 - **Correction patterns:** When do users modify AI choices?
 - **Usage analytics:** Tool effectiveness
@@ -354,14 +385,16 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 **Apply at work:**
 
 ### From Previous Sessions
+
 - Generate synthetic data
 - Topic modeling analysis
 - User feedback mechanisms
 - Entity-specific indices
 
 ### Query Routing Focus
+
 1. Which search methods would you want?
-2. Should tools be exposed to users?  
+2. Should tools be exposed to users?
 3. Can tools run in parallel?
 4. How do users discover capabilities?
 
@@ -372,11 +405,13 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ## Course Overview
 
 ### Sessions 4-5: Individual Indices
+
 - Segmentation & topic modeling
 - Specialized retrieval (docs, images, SQL)
 - Query routing foundation
 
 ### Session 6: Combining Everything
+
 - Tool architecture layers
 - Query routing metrics
 - RAG playbook applied to routing
@@ -393,10 +428,11 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ### What You Must Internalize
 
 **1. Evaluations Are Everything**
+
 > "Evaluations are what you need to understand how to improve"
 
 - Evaluations are datasets that inform decisions
-- Power few-shot examples  
+- Power few-shot examples
 - Enable retrieval systems
 - Become fine-tuning data
 
@@ -409,8 +445,9 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ## Data Is the Foundation
 
 **Synthetic data + customer feedback = same coin**
+
 - All data augmentation at different scales
-- Fundamental building blocks of ML products  
+- Fundamental building blocks of ML products
 - Same process for 20+ years in ML
 
 > "If you refuse to believe this, you're condemning yourself to being lost and confused in this hyped landscape"
@@ -422,8 +459,8 @@ P(success) = P(correct tool | query) × P(success | correct tool) × P(query)
 ## The Virtuous Cycle
 
 ```
-Good Product (strong UX) 
-    → Better Evaluations  
+Good Product (strong UX)
+    → Better Evaluations
     → Better Models/Training
     → Even Better Product
     → Repeat...
@@ -438,12 +475,14 @@ Good Product (strong UX)
 ## Technology Changes, Fundamentals Endure
 
 **Constants that matter:**
+
 - **Strong fundamentals** over hype
-- **Product-oriented thinking** over tech chasing  
+- **Product-oriented thinking** over tech chasing
 - **Data-driven improvement** over intuition
 - **Systematic evaluation** over ad-hoc testing
 
 **What's new becomes old:**
+
 - New companies, technologies, frameworks
 - Same underlying principles
 - Focus on transcendent fundamentals
@@ -454,15 +493,17 @@ Good Product (strong UX)
 
 ## Thank You & Feedback
 
-**Course Goal:** 
+**Course Goal:**
 Convey importance of strong fundamentals for successful RAG
 
 **Your Feedback:**
+
 - Missing topics?
 - Improvement suggestions?
 - Better examples?
 
 **Continuing Support:**
+
 - Office hours all year
 - Slack community
 - Additional videos based on feedback
@@ -477,4 +518,4 @@ Convey importance of strong fundamentals for successful RAG
 
 **Next:** Office hours, Q&A, community support
 
-*maven.com/applied-llms/rag-playbook*
+_maven.com/applied-llms/rag-playbook_

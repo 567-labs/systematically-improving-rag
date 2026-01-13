@@ -31,11 +31,13 @@ Jason Liu
 ## Progress Review: Sessions 1-4
 
 **Sessions 1-3: Foundation Building**
+
 - **Session 1:** RAG playbook, synthetic data generation
 - **Session 2:** Fine-tuning for relevancy improvements
 - **Session 3:** User experience to collect more data
 
 **Session 4: Split Strategy**
+
 - Built segmentation models for users and queries
 - Prioritized segments by impact, volume, probability of success
 - Identified new capabilities through data analysis
@@ -51,6 +53,7 @@ Jason Liu
 **Key Principle:** When segments exist in a population, local solutions outperform global ones
 
 **Why Build Specific Indices?**
+
 - **Division of Labor:** Teams can work on isolated problems
 - **Scalability:** Adding new indices easier than rebuilding systems
 - **Performance:** Specialized solutions beat general purpose
@@ -59,8 +62,9 @@ Jason Liu
 > "Instead of one search index, split the problem space and solve each locally"
 
 **Real-World Reference:** Google has been doing this for years
+
 - Google Maps (location queries)
-- Google Photos (image searches) 
+- Google Photos (image searches)
 - YouTube (video content)
 - Web (general text)
 - Shopping (product searches)
@@ -76,23 +80,29 @@ Google's router decides which tool to show based on your search intent
 **Three Different Search Needs:**
 
 ### Lexical Search
+
 ```
 "How does the XZF2000 compare to the XZF3000?"
 ```
+
 Serial numbers don't embed well - need exact matching
 
 <!-- This hardware store example shows why we need specialized indices. Serial numbers like XZF2000 vs XZF3000 don't embed to anything meaningful in vector space - you need exact lexical matching. But sentiment questions about durability need semantic understanding. Spec queries need structured data access through text-to-SQL. One size doesn't fit all. -->
 
-### Semantic Search  
+### Semantic Search
+
 ```
 "What do people think about this saw's durability?"
 ```
+
 Opinion and sentiment queries need semantic understanding
 
 ### Structured Search
+
 ```
 "How much does it weigh? What's the latest version?"
 ```
+
 Spec queries need text-to-SQL over manufacturer data
 
 ---
@@ -130,12 +140,14 @@ response = client.chat.completions.create(
 ## Combining Multiple Search Results
 
 ### Short-term Approach
+
 1. Concatenate results from all relevant indices
 2. Apply reranker to results
 3. Stuff everything into context
 4. Generate final response
 
 ### Long-term Approach
+
 ```python
 # Train ranking model with multiple signals
 final_score = (
@@ -148,6 +160,7 @@ final_score = (
 ```
 
 <!-- Long-term you can train a ranking model with multiple signals - cosine similarity, Cohere rerank scores, authority, freshness, citation scores. But the key insight is starting simple with concatenation and reranking, then evolving to more sophisticated approaches as you understand your use cases better. -->
+
 ```
 
 ---
@@ -156,14 +169,16 @@ final_score = (
 
 **The Fundamental Equation:**
 ```
-P(correct chunk found) = P(correct chunk | correct retriever) × P(correct retriever)
-```
 
-**This Session:** Focus on `P(correct chunk | correct retriever)`  
+P(correct chunk found) = P(correct chunk | correct retriever) × P(correct retriever)
+
+````
+
+**This Session:** Focus on `P(correct chunk | correct retriever)`
 **Next Session:** Focus on `P(correct retriever)`
 
 **Debugging Strategy:**
-- If routing fails → Better prompts, examples  
+- If routing fails → Better prompts, examples
 - If retrieval fails → Better embeddings, filtering
 
 **The Process:**
@@ -216,12 +231,12 @@ class FinancialStatement(BaseModel):
 financial_data = client.chat.completions.create(
     model="gpt-4",
     messages=[{
-        "role": "system", 
+        "role": "system",
         "content": "Extract financial data from earnings report"
     }],
     response_model=FinancialStatement
 )
-```
+````
 
 **Result:** Query structured database instead of text chunks
 
@@ -229,7 +244,7 @@ financial_data = client.chat.completions.create(
 
 ---
 
-## Approach 2: Synthetic Text Generation  
+## Approach 2: Synthetic Text Generation
 
 **Goal:** Create summaries optimized for recall
 
@@ -239,7 +254,7 @@ class DocumentSummary(BaseModel):
     category: str  # Classification
     summary: str   # Optimized for embedding
     entities: List[str]
-    
+
 # Generate synthetic text chunk
 summary = extract_summary(document)
 embedded_summary = embed(summary.summary)
@@ -250,7 +265,8 @@ original_docs = [get_original(result.doc_id) for result in search_results]
 ```
 
 <!-- The second approach is creating synthetic text optimized for recall. Generate summaries, FAQ extractions, detailed image descriptions - then use these as pointers back to original source material. For images, don't just ask "what's in this image?" - be specific about the kinds of queries users will ask. Include scene details, mood, objects, relationships. -->
-```
+
+````
 
 ---
 
@@ -310,9 +326,10 @@ for chunk in chunks:
         "entities": extract_entities(chunk),
         "category": categorize(chunk)
     }
-```
+````
 
 ### Contextual Retrieval
+
 - Rewrite chunks with surrounding context
 - Leverage prompt caching for efficiency
 
@@ -327,16 +344,18 @@ for chunk in chunks:
 **Challenge:** Generic captions vs. specific user queries
 
 ### Bad Prompt
+
 ```
 "What's in this image?"
 → "Two people"
 ```
 
 ### Better Prompt
+
 ```
 "Describe this image for search purposes. Include:
 - Scene details and mood
-- People and their actions  
+- People and their actions
 - Objects and their relationships
 - Potential user questions this answers"
 → "Two people arguing intensely at dinner table, one holding knife, mysterious foggy atmosphere"
@@ -354,10 +373,10 @@ for chunk in chunks:
 def process_image(image_path, document_context=None):
     # Extract OCR text
     ocr_text = extract_ocr(image_path)
-    
+
     # Get surrounding text if in document
     context = get_surrounding_text(image_path, document_context)
-    
+
     # Generate detailed description
     description = generate_description(
         image=image_path,
@@ -365,7 +384,7 @@ def process_image(image_path, document_context=None):
         context=context,
         user_query_examples=SAMPLE_QUERIES
     )
-    
+
     return {
         "description": description,
         "ocr_text": ocr_text,
@@ -405,8 +424,9 @@ Generate 2-3 potential questions users might ask about this image.
 **Remember:** Synthetic data must improve metrics, not just look good
 
 ### Evaluation Process
+
 1. **Generate synthetic queries** for your data types
-2. **Measure recall** before and after enhancement  
+2. **Measure recall** before and after enhancement
 3. **Compare approaches** (structured vs summary)
 4. **Iterate on prompts** based on performance
 
@@ -419,7 +439,8 @@ assert enhanced_recall > baseline_recall
 ```
 
 <!-- Remember: synthetic data must improve metrics, not just look good. Generate synthetic queries for your data types, measure recall before and after enhancement, compare approaches, iterate on prompts based on performance. Don't just create synthetic data that looks impressive - create data that actually improves your system's performance. -->
-```
+
+````
 
 ---
 
@@ -431,7 +452,7 @@ assert enhanced_recall > baseline_recall
    - Does this segment get enough/too much traffic?
    - Should we promote/demote this capability?
 
-2. **Tool Selection Issues:**  
+2. **Tool Selection Issues:**
    - Are we choosing the right tool for queries?
    - Need better routing prompts/examples?
 
@@ -465,9 +486,9 @@ assert enhanced_recall > baseline_recall
 - User experience optimization
 - A/B testing different approaches
 
-### Backend/Implementation Teams  
+### Backend/Implementation Teams
 - **Document Team:** PDF processing, chunking
-- **Image Team:** Vision models, OCR, descriptions  
+- **Image Team:** Vision models, OCR, descriptions
 - **Structured Data Team:** Text-to-SQL, extractions
 
 ### Integration/Routing Team
@@ -497,9 +518,10 @@ SELECT * FROM revenue WHERE MONTH(date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)
 
 -- Option 3: 28-day rolling average
 SELECT AVG(revenue) FROM revenue WHERE date >= CURRENT_DATE - INTERVAL 28 DAY
-```
+````
 
 **Solution:** Golden SQL snippets that capture business definitions
+
 - Create UI to let users "star" correct SQL statements
 - Build inventory of business-specific calculation patterns
 - Use these as few-shot examples
@@ -511,6 +533,7 @@ SELECT AVG(revenue) FROM revenue WHERE date >= CURRENT_DATE - INTERVAL 28 DAY
 ## Table Retrieval Strategy
 
 ### Step 1: Table Discovery
+
 ```python
 # Test: "How many users generated $10k+ revenue?"
 # Should retrieve: users_table + finance_table
@@ -520,6 +543,7 @@ assert all(table in retrieved_tables for table in expected_tables)
 ```
 
 ### Step 2: SQL Snippet Retrieval
+
 ```python
 # Test: "Show month over month growth"
 # Should retrieve: business-specific MoM calculation
@@ -529,6 +553,7 @@ assert relevant_snippet in retrieved_snippets
 ```
 
 ### Step 3: Co-occurrence Patterns
+
 - Track which tables are used together
 - If queries use users + finance, maybe also include orders
 - Trade-off between precision and recall
@@ -540,12 +565,14 @@ assert relevant_snippet in retrieved_snippets
 ## The Recursive Playbook Pattern
 
 **Universal Application:**
+
 - **Documents:** Extract → Structure → Query
-- **Images:** Describe → Embed → Retrieve  
+- **Images:** Describe → Embed → Retrieve
 - **Tables:** Discover → Pattern → Execute
 - **Text-to-SQL:** Inventory + Capabilities framework
 
 **Key Insight:** Same playbook recursively applies to every subsystem
+
 1. Define synthetic data and evals
 2. Measure precision/recall (proxy for success probability)
 3. Segment to identify problems
@@ -553,6 +580,7 @@ assert relevant_snippet in retrieved_snippets
 5. Improve each retriever individually
 
 **Reality:** None of these systems are "fire and forget"
+
 - Continuous monitoring required
 - Always iterating on processes
 - You're responsible for retrieval, no matter how good AI gets
@@ -572,6 +600,7 @@ assert relevant_snippet in retrieved_snippets
 5. **Plan Integration:** How will this connect to routing system?
 
 **Key Questions:**
+
 - What metadata exists that could make search simpler?
 - Should you extract structured data or generate synthetic summaries?
 - What business-specific logic needs to be captured in examples?
@@ -596,6 +625,7 @@ assert relevant_snippet in retrieved_snippets
 **Goal:** Transform individual tools into cohesive application
 
 **Pattern Recognition:** This is how machine learning evolves
+
 1. **Start:** Small specialized models
 2. **Scale:** Bigger monolithic models
 3. **Specialize:** Mixture of experts when can't scale further
@@ -610,12 +640,14 @@ assert relevant_snippet in retrieved_snippets
 ## Key Takeaways
 
 ### Technical Insights
+
 1. **Local beats global** when segments exist
 2. **Two improvement classes:** Extract structure or generate summaries
 3. **AI-powered materialized views** of your data
 4. **Metrics transfer:** Precision/recall apply to tool selection
 
-### Strategic Insights  
+### Strategic Insights
+
 1. **Divide and conquer:** Teams can work on separate indices
 2. **Systematic debugging:** Formula tells you what to fix
 3. **User-driven design:** Optimize for actual search patterns
@@ -632,7 +664,7 @@ assert relevant_snippet in retrieved_snippets
 **Technology Changes, Principles Endure:**
 
 - **Measure first:** Establish baselines before optimizing
-- **Segment users:** Different needs require different solutions  
+- **Segment users:** Different needs require different solutions
 - **Iterate systematically:** Data-driven improvement cycles
 - **Focus on impact:** Work on what matters most
 
@@ -645,10 +677,11 @@ assert relevant_snippet in retrieved_snippets
 ## Thank You
 
 **Questions for office hours:**
+
 - Which approach fits your use case better?
 - How to measure success for your specific domain?
 - Team organization for multiple indices?
 
-*maven.com/applied-llms/rag-playbook*
+_maven.com/applied-llms/rag-playbook_
 
 <!-- Questions for office hours: Which approach fits your use case better - structured extraction or synthetic summaries? How do you measure success for your specific domain? How should you organize teams for multiple indices? The key insight to remember: you're building AI-powered materialized views of your data, and boring systematic processes always win over clever one-off solutions. -->

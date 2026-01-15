@@ -14,13 +14,15 @@ def extract_pdf_to_markdown(pdf_path: str) -> str:
 
 def main():
     workshops_dir = Path(__file__).parent
+    slides_dir = workshops_dir.parent / "slides"
+    slides_dir.mkdir(exist_ok=True)
     pdf_files = list(workshops_dir.glob("*.pdf"))
     
     print(f"Found {len(pdf_files)} PDF files to process...")
     
     for pdf_file in sorted(pdf_files):
         chapter_name = pdf_file.stem  # e.g., "chapter6"
-        output_file = workshops_dir / f"{chapter_name}-slides.md"
+        output_file = slides_dir / f"{chapter_name}-slides.md"
         
         print(f"Processing {pdf_file.name}...")
         

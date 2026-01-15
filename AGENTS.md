@@ -4,7 +4,8 @@
 - `latest/`: Current course code and the WildChat case study (`latest/case_study/{core,pipelines}`).
 - `cohort_1/`, `cohort_2/`: Earlier cohort materials kept for reference.
 - `docs/`: MkDocs book sources; site config in `mkdocs.yml`.
-- `docs/workshops/`: Chapter content `chapterN.md` and subparts `chapterN-M.md`, plus `chapterN-slides.md`; entrypoint is `docs/workshops/index.md`.
+- `docs/workshops/`: Chapter content `chapterN.md` and subparts `chapterN-M.md`; entrypoint is `docs/workshops/index.md`.
+- `docs/slides/`: Slide decks `chapterN-slides.md` for workshop chapters.
 - `md/`: Markdown exports of notebooks; images in `images/`.
 - `scripts/`, `build_book.sh`: Utilities for diagrams and building the PDF/ebook.
 

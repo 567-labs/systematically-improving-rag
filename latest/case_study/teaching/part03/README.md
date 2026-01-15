@@ -176,15 +176,6 @@ echo "v1" | uv run python main.py evaluate --question-version v1 --embeddings-ty
 
 **Verification**: Re-tested with 2 questions showed 100% recall, confirming evaluation pipeline works correctly.
 
-### TODO: Full Conversation Results
-
-[To be filled after Experiment 2]
-
-| Query Type | Recall@1 | Recall@5 | Recall@10 | Recall@30 | Storage Size |
-| ---------- | -------- | -------- | --------- | --------- | ------------ |
-| v1         |          |          |           |           |              |
-| v2         |          |          |           |           |              |
-
 ### Summary Comparison Results (Full Dataset - 995-1000 questions each)
 
 **Completed comprehensive evaluations for v1, v3, and v4 summary embeddings**

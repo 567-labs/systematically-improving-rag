@@ -1,16 +1,21 @@
 # Systematically Improving RAG: A Complete Case Study
 
-This case study provides a hands-on approach to understanding and improving RAG (Retrieval-Augmented Generation) systems. Through systematic experimentation with the WildChat dataset, we explore the critical alignment problem between query generation and embedding strategies.
+This case study demonstrates the RAG improvement flywheel in action using the WildChat dataset. You'll discover the alignment problem between query generation and embedding strategies, then systematically improve performance from 11% to 82% recall through measured iterations.
+
+**Real-World Connection**: The techniques here mirror the blueprint search case (27% → 85% in 4 days, Workshop Chapter 5.2) and construction company routing (65% → 78%, Chapters 6.1-6.2). Same systematic approach, different contexts.
 
 ## Learning Objectives
 
 By completing this case study, you will learn:
 
-- How to systematically evaluate RAG systems
-- The critical importance of alignment between queries and embeddings
-- Practical techniques for improving retrieval performance
-- How to measure and compare different embedding strategies
+- **Workshop Chapter 1 in Practice**: How to systematically evaluate RAG systems with synthetic data
+- **Workshop Chapter 2 in Practice**: The critical importance of alignment between queries and embeddings
+- **Workshop Chapter 5 in Practice**: Practical techniques for improving retrieval through specialization
+- How to measure and compare different embedding strategies (evaluation first!)
 - The trade-offs between different approaches to query generation
+- When reranking helps and when alignment matters more
+
+**Performance Journey**: v1 queries on first messages (62% recall) → v2 queries on first messages (11% recall) → v5 summaries with v2 queries (55% recall) → understanding the alignment problem is the breakthrough
 
 ## Project Structure
 
@@ -323,4 +328,3 @@ If you encounter issues:
 The key insight you'll discover: **In RAG systems, alignment between queries and embeddings matters more than model sophistication.**
 
 ---
-

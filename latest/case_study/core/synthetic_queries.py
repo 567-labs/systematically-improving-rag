@@ -1,3 +1,19 @@
+"""
+Synthetic query generation for RAG evaluation.
+
+Implements Workshop Chapter 1 concepts:
+- v1: Content-focused queries (what users asked about) → 62% recall
+- v2: Pattern-focused queries (how users phrased it) → 11% recall on first messages
+
+The Alignment Problem: v1 queries work well with first-message embeddings because 
+they're both content-focused. v2 queries need different embeddings (summaries) because 
+they focus on conversational patterns. This 50% performance gap demonstrates why 
+matching query strategy to embedding strategy matters more than reranking.
+
+See Workshop Chapter 5.2 for how this parallels blueprint search: task-specific 
+summaries (85%) vs generic embeddings (27%).
+"""
+
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 

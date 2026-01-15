@@ -1,3 +1,21 @@
+"""
+Conversation summarization strategies for improved retrieval.
+
+Implements Workshop Chapter 5.2 concepts - synthetic text generation as compression:
+- v1: Search-optimized (content focus) → works well with v1 queries
+- v3: Balanced approach
+- v4: Pattern-optimized (conversation style) → works well with v2 queries  
+- v5: Hybrid (best of both) → 82.0% v1 recall, 55.0% v2 recall
+
+The Solution to Alignment Problem: When queries don't match embeddings, change the 
+embeddings! Summaries bridge the gap between what users search for and how conversations 
+are structured.
+
+Parallels Workshop Chapter 5.2 blueprint search: vision-generated summaries describing 
+spatial features (room counts, dimensions) instead of raw image embeddings. Same concept: 
+create searchable text that matches user mental models.
+"""
+
 from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 

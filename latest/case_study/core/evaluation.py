@@ -1,5 +1,13 @@
 """
 Evaluation metrics and functionality for RAG system.
+
+This module implements the evaluation-first approach from Workshop Chapter 1:
+- Calculate recall@k to measure retrieval quality
+- Store detailed results for error analysis (Chapter 1: understanding failure modes)
+- Enable systematic comparison of different strategies
+
+Key Insight: Measure before optimizing. The 50% performance gap between v1 and v2 
+queries would be invisible without systematic evaluation.
 """
 
 from pathlib import Path
